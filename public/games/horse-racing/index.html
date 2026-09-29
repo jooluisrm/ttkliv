@@ -1,46 +1,109 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Horse Racing - TikTok Live Games</title>
+
+    <title>Corrida da Live</title>
+
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <!-- OBS Overlay: transparent background, canvas fills viewport -->
 
-    <!-- Race Canvas -->
+  <body>
+
+    <!-- ========================================
+         CANVAS DA CORRIDA
+         ======================================== -->
     <canvas id="raceCanvas"></canvas>
 
-    <!-- HUD Overlay (DOM) -->
-    <div id="hud">
-      <!-- Phase Banner -->
-      <div id="phaseBanner" class="phase-banner">
-        <span id="phaseText">Waiting for gifts...</span>
-        <span id="phaseTimer"></span>
+
+    <!-- ========================================
+         PLACAR DE VITÓRIAS
+         ======================================== -->
+    <div id="victoryBoard">
+
+      <div class="victory-title">
+        🏆 VITÓRIAS
       </div>
 
-      <!-- Lane Labels (left side) -->
-      <div id="laneLabels"></div>
+      <div id="victoryList"></div>
 
-      <!-- Event Feed (bottom-right) -->
-      <div id="eventFeed"></div>
-
-      <!-- Winner Overlay (hidden until finish) -->
-      <div id="winnerOverlay" class="winner-overlay hidden">
-        <div class="winner-content">
-          <div id="winnerEmoji" class="winner-emoji"></div>
-          <div id="winnerName" class="winner-name"></div>
-          <div id="winnerSupporters" class="winner-supporters"></div>
-        </div>
-      </div>
     </div>
 
-    <!-- Dependencies -->
+
+    <!-- ========================================
+         HUD
+         ======================================== -->
+    <div id="hud">
+
+      <!-- Banner da fase -->
+      <div id="phaseBanner" class="phase-banner">
+
+        <span id="phaseText">
+          Aguardando comentários ou presentes...
+        </span>
+
+        <span id="phaseTimer"></span>
+
+      </div>
+
+
+      <!--
+        Mantemos estes elementos porque o
+        game.js ainda utiliza eles.
+        Eles ficam escondidos pelo CSS.
+      -->
+
+      <div id="laneLabels"></div>
+
+      <div id="eventFeed"></div>
+
+
+      <!-- ======================================
+           TELA DO VENCEDOR
+           ====================================== -->
+      <div
+        id="winnerOverlay"
+        class="winner-overlay hidden"
+      >
+
+        <div class="winner-content">
+
+          <div
+            id="winnerEmoji"
+            class="winner-emoji"
+          ></div>
+
+          <div
+            id="winnerName"
+            class="winner-name"
+          ></div>
+
+          <div
+            id="winnerSupporters"
+            class="winner-supporters"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================================
+         SCRIPTS
+         ======================================== -->
+
     <script src="/socket.io/socket.io.js"></script>
+
     <script src="/lib/tiktok-bridge.js"></script>
+
     <script src="config.js"></script>
+
     <script src="race-engine.js"></script>
+
     <script src="game.js"></script>
+
   </body>
 </html>

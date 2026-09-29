@@ -1,195 +1,360 @@
-/**
- * config.js
- * Horse Racing game configuration.
- *
- * LANE SYSTEM:
- * - Each lane = a country flag (viewers root for their country).
- * - Gifts are mapped to lanes by name, balanced across value tiers.
- * - Overlay shows which gift powers which horse.
- *
- * CUSTOMIZING:
- * - Use debug.html to discover exact gift names from your TikTok stream.
- * - Update giftTiers below to match your audience's available gifts.
- *
- * @module games/horse-racing/config
- */
-
 const CONFIG = {
-	// ==========================================
-	// LANES (HORSES = COUNTRY FLAGS)
-	// Top TikTok markets in Asia
-	// ==========================================
-	lanes: [
-		{ id: 0, name: "Vietnam", flag: "🇻🇳", color: "#FF4444", aliases: ["vn", "vietnam", "viet nam", "viet"] },
-		{ id: 1, name: "Thailand", flag: "🇹🇭", color: "#4488FF", aliases: ["th", "tl", "thailand", "thai"] },
-		{ id: 2, name: "Indonesia", flag: "🇮🇩", color: "#44DD44", aliases: ["id", "indonesia", "indo"] },
-		{ id: 3, name: "Malaysia", flag: "🇲🇾", color: "#FFCC00", aliases: ["my", "ml", "malaysia", "malay"] },
-		{ id: 4, name: "China", flag: "🇨🇳", color: "#CC44FF", aliases: ["cn", "china", "trung quoc", "trung"] },
-	],
+  // ==========================================
+  // PARTICIPANTES
+  // ==========================================
 
-	// ==========================================
-	// GIFT → LANE MAPPING (by value tier)
-	// Each tier: equal-cost gifts, one per lane.
-	// Array index = lane index (0=VN, 1=TH, 2=ID, 3=MY, 4=CN).
-	// ==========================================
-	giftTiers: [
-		{
-			coins: 1,
-			gifts: [
-				{ name: "Rose", emoji: "🌹" },
-				{ name: "GG", emoji: "✌️" },
-				{ name: "Ice Cream Cone", emoji: "🍦" },
-				{ name: "Finger Heart", emoji: "🫰" },
-				{ name: "TikTok", emoji: "🎵" },
-			],
-		},
-		{
-			coins: 5,
-			gifts: [
-				{ name: "Hand Heart", emoji: "💕" },
-				{ name: "Little Crown", emoji: "👑" },
-				{ name: "Butterfly", emoji: "🦋" },
-				{ name: "Love You", emoji: "💗" },
-				{ name: "Wishing Bottle", emoji: "🧴" },
-			],
-		},
-		{
-			coins: 10,
-			gifts: [
-				{ name: "Perfume", emoji: "💐" },
-				{ name: "Doughnut", emoji: "🍩" },
-				{ name: "Cap", emoji: "🧢" },
-				{ name: "Paper Crane", emoji: "🕊️" },
-				{ name: "Sunglasses", emoji: "🕶️" },
-			],
-		},
-		{
-			coins: 99,
-			gifts: [
-				{ name: "Garland", emoji: "🏵️" },
-				{ name: "Singing Mic", emoji: "🎤" },
-				{ name: "Star", emoji: "⭐" },
-				{ name: "Concert", emoji: "🎸" },
-				{ name: "Lock and Key", emoji: "🔐" },
-			],
-		},
-	],
+  lanes: [
+    {
+      id: 0,
+      name: "RENAN SANTOS",
+      flag: "🚂",
+      color: "#3498db",
+      image: "/games/imagens/renan.webp",
 
-	// ==========================================
-	// RACE PHASES & TIMING (ms)
-	// ==========================================
-	phases: {
-		/** WAITING — lobby, waiting for first gift to start countdown */
-		waiting: { duration: Infinity },
-		/** COUNTDOWN — 10s before race begins */
-		countdown: { duration: 10_000 },
-		/** RACING — gifts move horses, first to finish wins */
-		racing: { duration: 120_000 }, // max race length (2 min failsafe)
-		/** FINISHED — show winner for 8s */
-		finished: { duration: 8_000 },
-		/** COOLDOWN — brief pause before auto-reset */
-		cooldown: { duration: 5_000 },
-	},
+      // Número usado no chat: 14
+      aliases: [
+        "renan",
+        "renan santos",
+        "14"
+      ]
+    },
 
-	// ==========================================
-	// RACE MECHANICS
-	// ==========================================
-	/** Distance (arbitrary units) a horse must reach to win */
-	finishLine: 1000,
+    {
+      id: 1,
+      name: "LULA",
+      flag: "🚂",
+      color: "#e74c3c",
+      image: "/games/imagens/lula.webp",
 
-	/** Distance a single chat vote gives (much less than gifts) */
-	chatDistance: 3,
+      // Número usado no chat: 13
+      aliases: [
+        "lula",
+        "13"
+      ]
+    },
 
-	/**
-	 * Convert gift diamond value to movement distance.
-	 * Tunable: base + multiplier * sqrt(value) gives diminishing returns on mega-gifts.
-	 */
-	giftToDistance(giftValue) {
-		return Math.round(5 + 3 * Math.sqrt(giftValue));
-	},
+    {
+      id: 2,
+      name: "FLÁVIO BOLSONARO",
+      flag: "🚂",
+      color: "#f1c40f",
+      image: "/games/imagens/flavio.jpg",
 
-	/**
-	 * Resolve gift → lane index.
-	 * Priority: 1) giftName match in tier map, 2) giftId % lanes fallback.
-	 */
-	giftToLane(giftName, giftId, laneCount) {
-		// Build name→lane lookup on first call (lazy init)
-		if (!this._giftNameMap) {
-			this._giftNameMap = {};
-			for (const tier of this.giftTiers) {
-				tier.gifts.forEach((g, idx) => {
-					this._giftNameMap[g.name.toLowerCase()] = idx;
-				});
-			}
-		}
-		const key = (giftName || "").toLowerCase();
-		if (key && this._giftNameMap[key] !== undefined) {
-			return this._giftNameMap[key];
-		}
-		// Fallback for unmapped gifts
-		return Math.abs(giftId || 0) % laneCount;
-	},
+      // Número usado no chat: 22
+      aliases: [
+        "flavio",
+        "flávio",
+        "flavio bolsonaro",
+        "flávio bolsonaro",
+        "22"
+      ]
+    },
 
-	/**
-	 * Get gift emoji by name (for HUD/feed display).
-	 */
-	getGiftEmoji(giftName) {
-		if (!this._giftEmojiMap) {
-			this._giftEmojiMap = {};
-			for (const tier of this.giftTiers) {
-				for (const g of tier.gifts) {
-					this._giftEmojiMap[g.name.toLowerCase()] = g.emoji;
-				}
-			}
-		}
-		return this._giftEmojiMap[(giftName || "").toLowerCase()] || "🎁";
-	},
+    {
+      id: 3,
+      name: "CAIADO",
+      flag: "🚂",
+      color: "#2ecc71",
+      image: "/games/imagens/caiado.webp",
 
-	/**
-	 * Get all gift emojis for a lane (for HUD legend).
-	 * @param {number} laneIdx
-	 * @returns {string[]} Array of emoji strings
-	 */
-	getLaneGiftEmojis(laneIdx) {
-		return this.giftTiers
-			.map((tier) => tier.gifts[laneIdx]?.emoji)
-			.filter(Boolean);
-	},
+      // Número usado no chat: 55
+      aliases: [
+        "caiado",
+        "ronaldo caiado",
+        "55"
+      ]
+    }
+  ],
 
-	/**
-	 * Chat-based lane selection.
-	 * Viewer types country code (VN, TH, ID, MY, CN), aliases, or number 1-5.
-	 * Case-insensitive, trimmed.
-	 * @returns {number} lane index or -1 if no match
-	 */
-	chatToLane(comment) {
-		const text = (comment || "").toLowerCase().trim();
-		if (!text) return -1;
+  // ==========================================
+  // PRESENTES DO TIKTOK
+  // ==========================================
 
-		// Number shortcut: "1"-"5"
-		const num = parseInt(text, 10);
-		if (num >= 1 && num <= this.lanes.length) return num - 1;
+  // posição 0 = Renan
+  // posição 1 = Lula
+  // posição 2 = Flávio
+  // posição 3 = Caiado
 
-		// Build alias lookup on first call (lazy init)
-		if (!this._chatAliasMap) {
-			this._chatAliasMap = {};
-			for (const lane of this.lanes) {
-				// Country name itself
-				this._chatAliasMap[lane.name.toLowerCase()] = lane.id;
-				// All aliases
-				for (const alias of lane.aliases || []) {
-					this._chatAliasMap[alias.toLowerCase()] = lane.id;
-				}
-			}
-		}
+  giftTiers: [
+    {
+      coins: 1,
+      gifts: [
+        {
+          name: "Rose",
+          emoji: "🌹"
+        },
+        {
+          name: "GG",
+          emoji: "🎉"
+        },
+        {
+          name: "Finger Heart",
+          emoji: "🫰"
+        },
+        {
+          name: "Like",
+          emoji: "❤️"
+        }
+      ]
+    },
 
-		return this._chatAliasMap[text] ?? -1;
-	},
+    {
+      coins: 5,
+      gifts: [
+        {
+          name: "Perfume",
+          emoji: "🌹"
+        },
+        {
+          name: "Cap",
+          emoji: "🧢"
+        },
+        {
+          name: "Doughnut",
+          emoji: "🍩"
+        },
+        {
+          name: "Cake",
+          emoji: "🎂"
+        }
+      ]
+    },
+
+    {
+      coins: 10,
+      gifts: [
+        {
+          name: "Money Gun",
+          emoji: "💰"
+        },
+        {
+          name: "Perfume",
+          emoji: "💎"
+        },
+        {
+          name: "Heart",
+          emoji: "💖"
+        },
+        {
+          name: "Star",
+          emoji: "⭐"
+        }
+      ]
+    },
+
+    {
+      coins: 99,
+      gifts: [
+        {
+          name: "Lion",
+          emoji: "🦁"
+        },
+        {
+          name: "Crown",
+          emoji: "👑"
+        },
+        {
+          name: "Galaxy",
+          emoji: "🌌"
+        },
+        {
+          name: "Dragon",
+          emoji: "🐉"
+        }
+      ]
+    }
+  ],
+
+  // ==========================================
+  // FASES DA CORRIDA
+  // ==========================================
+
+  phases: {
+    waiting: {
+      duration: Infinity
+    },
+
+    countdown: {
+      duration: 10000
+    },
+
+    // A corrida não possui limite de tempo.
+    racing: {
+      duration: Infinity
+    },
+
+    finished: {
+      duration: 8000
+    },
+
+    cooldown: {
+      duration: 5000
+    }
+  },
+
+  // ==========================================
+  // DISTÂNCIA DA CORRIDA
+  // ==========================================
+
+  finishLine: 1000,
+
+  // Quanto um comentário válido movimenta
+  chatDistance: 3,
+
+  // ==========================================
+  // PRESENTES → DISTÂNCIA
+  // ==========================================
+
+  giftToDistance(giftValue) {
+    return Math.round(
+      5 + 3 * Math.sqrt(giftValue)
+    );
+  },
+
+  // ==========================================
+  // PRESENTE → PARTICIPANTE
+  // ==========================================
+
+  giftToLane(giftName, giftId, laneCount) {
+    const name = String(
+      giftName || ""
+    ).toLowerCase();
+
+    for (let tier of this.giftTiers) {
+      for (
+        let i = 0;
+        i < tier.gifts.length;
+        i++
+      ) {
+        if (
+          String(
+            tier.gifts[i].name
+          ).toLowerCase() === name
+        ) {
+          return i % laneCount;
+        }
+      }
+    }
+
+    // Caso o presente não seja encontrado,
+    // usa o ID para escolher participante.
+    if (
+      giftId !== undefined &&
+      giftId !== null
+    ) {
+      return (
+        Math.abs(Number(giftId)) %
+        laneCount
+      );
+    }
+
+    return 0;
+  },
+
+  // ==========================================
+  // EMOJI DO PRESENTE
+  // ==========================================
+
+  getGiftEmoji(giftName) {
+    const name = String(
+      giftName || ""
+    ).toLowerCase();
+
+    for (let tier of this.giftTiers) {
+      for (let gift of tier.gifts) {
+        if (
+          String(
+            gift.name
+          ).toLowerCase() === name
+        ) {
+          return gift.emoji;
+        }
+      }
+    }
+
+    return "🎁";
+  },
+
+  // ==========================================
+  // EMOJIS DOS PRESENTES DE CADA PARTICIPANTE
+  // ==========================================
+
+  getLaneGiftEmojis(laneIdx) {
+    const emojis = [];
+
+    for (let tier of this.giftTiers) {
+      if (tier.gifts[laneIdx]) {
+        emojis.push(
+          tier.gifts[laneIdx].emoji
+        );
+      }
+    }
+
+    return emojis;
+  },
+
+  // ==========================================
+  // CHAT → PARTICIPANTE
+  // ==========================================
+
+  chatToLane(comment) {
+    if (!comment) {
+      return null;
+    }
+
+    // Remove acentos e espaços extras
+    const normalized = String(comment)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+      .trim();
+
+    for (
+      let i = 0;
+      i < this.lanes.length;
+      i++
+    ) {
+      const lane =
+        this.lanes[i];
+
+      for (
+        let alias of lane.aliases
+      ) {
+        const normalizedAlias =
+          String(alias)
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(
+              /[\u0300-\u036f]/g,
+              ""
+            )
+            .trim();
+
+        if (
+          normalized ===
+          normalizedAlias
+        ) {
+          return i;
+        }
+      }
+    }
+
+    return null;
+  }
 };
 
-// Make available in both module and browser global contexts
-if (typeof module !== "undefined" && module.exports) {
-	module.exports = CONFIG;
+// ==========================================
+// EXPORTAÇÃO
+// ==========================================
+
+if (
+  typeof module !== "undefined" &&
+  module.exports
+) {
+  module.exports = CONFIG;
 } else {
-	window.RACE_CONFIG = CONFIG;
+  window.RACE_CONFIG = CONFIG;
 }

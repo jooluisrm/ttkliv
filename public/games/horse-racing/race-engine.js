@@ -24,101 +24,177 @@ class RaceEngine {
 	// ==========================================
 
 	reset() {
-		const laneCount = this.config.lanes.length;
 		this.state = {
 			phase: "waiting",
 			phaseStartedAt: Date.now(),
+
 			lanes: this.config.lanes.map((lane) => ({
 				...lane,
 				distance: 0,
-				supporters: new Map(), // uniqueId → { nickname, totalContrib }
+				supporters: new Map(),
 			})),
+
 			winner: null,
-			raceCount: this.state?.raceCount || 0,
-			recentEvents: [], // last N events for HUD feed
+
+			raceCount:
+				this.state?.raceCount || 0,
+
+			recentEvents: [],
 		};
-		this._emit("phaseChange", { phase: "waiting" });
+
+		this._emit("phaseChange", {
+			phase: "waiting",
+		});
 	}
 
 	// ==========================================
 	// PHASE TRANSITIONS
 	// ==========================================
 
-	/**
-	 * Advance phase. Called by a tick loop or event trigger.
-	 * @param {string} nextPhase
-	 */
 	_setPhase(nextPhase) {
 		this.state.phase = nextPhase;
 		this.state.phaseStartedAt = Date.now();
-		this._emit("phaseChange", { phase: nextPhase });
+
+		this._emit("phaseChange", {
+			phase: nextPhase,
+		});
 	}
 
-	/** Time elapsed in current phase (ms) */
+	/**
+	 * Tempo passado na fase atual.
+	 */
 	phaseElapsed() {
-		return Date.now() - this.state.phaseStartedAt;
+		return (
+			Date.now() -
+			this.state.phaseStartedAt
+		);
 	}
 
-	/** Time remaining in current phase (ms), or Infinity */
+	/**
+	 * Tempo restante da fase atual.
+	 */
 	phaseRemaining() {
-		const dur = this.config.phases[this.state.phase]?.duration ?? Infinity;
-		if (dur === Infinity) return Infinity;
-		return Math.max(0, dur - this.phaseElapsed());
+		const dur =
+			this.config.phases[
+				this.state.phase
+			]?.duration ?? Infinity;
+
+		if (dur === Infinity) {
+			return Infinity;
+		}
+
+		return Math.max(
+			0,
+			dur - this.phaseElapsed()
+		);
 	}
 
 	// ==========================================
-	// TICK — call from requestAnimationFrame
+	// TICK
 	// ==========================================
 
 	/**
-	 * Main update tick. Handles phase timeouts / auto-transitions.
-	 * Returns current state for rendering.
+	 * Atualização principal do jogo.
+	 *
+	 * IMPORTANTE:
+	 * A corrida NÃO possui mais limite
+	 * de tempo.
+	 *
+	 * Ela só termina quando alguém
+	 * chegar na linha de chegada.
 	 */
 	tick() {
 		const { phase } = this.state;
-		const remaining = this.phaseRemaining();
+		const remaining =
+			this.phaseRemaining();
 
-		if (phase === "countdown" && remaining <= 0) {
+		// COUNTDOWN terminou
+		if (
+			phase === "countdown" &&
+			remaining <= 0
+		) {
 			this._setPhase("racing");
-		} else if (phase === "racing" && remaining <= 0) {
-			// Time limit — pick horse with most distance as winner
-			this._resolveWinner();
-		} else if (phase === "finished" && remaining <= 0) {
+		}
+
+		// Vencedor já foi definido.
+		// Aguarda antes do cooldown.
+		else if (
+			phase === "finished" &&
+			remaining <= 0
+		) {
 			this._setPhase("cooldown");
-		} else if (phase === "cooldown" && remaining <= 0) {
+		}
+
+		// Cooldown terminou.
+		// Prepara uma nova corrida.
+		else if (
+			phase === "cooldown" &&
+			remaining <= 0
+		) {
 			this.state.raceCount++;
+
 			this.reset();
 		}
+
+		/*
+		 * NÃO existe condição de tempo
+		 * para a fase "racing".
+		 *
+		 * Portanto, mesmo que o tempo
+		 * configurado chegue a zero,
+		 * a corrida continua normalmente.
+		 *
+		 * Somente _checkFinish()
+		 * pode finalizar a corrida.
+		 */
 
 		return this.state;
 	}
 
 	// ==========================================
-	// EVENT HANDLERS (called by game.js)
+	// EVENT HANDLERS
 	// ==========================================
 
 	/**
-	 * Process a gift event.
-	 * @param {{giftId: number, giftValue: number, user: {uniqueId: string, nickname: string}}} data
+	 * Processa presentes.
 	 */
 	handleGift(data) {
 		const { phase } = this.state;
 
-		// In waiting phase, first gift triggers countdown
+		// Primeiro presente inicia countdown
 		if (phase === "waiting") {
 			this._setPhase("countdown");
 		}
 
-		// During countdown and racing, gifts move horses
-		if (phase === "countdown" || phase === "racing") {
-			const laneCount = this.state.lanes.length;
-			// Name-based mapping (priority) with giftId fallback
-			const laneIdx = this.config.giftToLane(data.giftName, data.giftId, laneCount);
-			const distance = this.config.giftToDistance(data.giftValue);
+		// Durante countdown ou corrida
+		if (
+			phase === "countdown" ||
+			phase === "racing"
+		) {
+			const laneCount =
+				this.state.lanes.length;
 
-			this._moveLane(laneIdx, distance, data.user, data);
+			const laneIdx =
+				this.config.giftToLane(
+					data.giftName,
+					data.giftId,
+					laneCount
+				);
 
-			// Check for winner (only during racing)
+			const distance =
+				this.config.giftToDistance(
+					data.giftValue
+				);
+
+			this._moveLane(
+				laneIdx,
+				distance,
+				data.user,
+				data
+			);
+
+			// Só pode vencer depois
+			// que a corrida começou.
 			if (phase === "racing") {
 				this._checkFinish();
 			}
@@ -126,167 +202,296 @@ class RaceEngine {
 	}
 
 	/**
-	 * Process a chat event.
-	 * If comment matches a country code/alias, move that horse.
-	 * @param {{user: {uniqueId: string, nickname: string}, comment: string}} data
+	 * Processa comentários.
 	 */
 	handleChat(data) {
 		const { phase } = this.state;
-		const comment = (data.comment || "").trim();
 
-		// Try to match comment to a lane
-		const laneIdx = this.config.chatToLane(comment);
+		const comment =
+			(data.comment || "").trim();
+
+		const laneIdx =
+			this.config.chatToLane(
+				comment
+			);
 
 		if (laneIdx >= 0) {
-			// In waiting phase, first vote triggers countdown
+			// Primeiro voto inicia countdown
 			if (phase === "waiting") {
-				this._setPhase("countdown");
+				this._setPhase(
+					"countdown"
+				);
 			}
 
-			// During countdown and racing, votes move horses
-			if (phase === "countdown" || phase === "racing") {
-				const distance = this.config.chatDistance || 3;
-				const lane = this.state.lanes[laneIdx];
+			if (
+				phase === "countdown" ||
+				phase === "racing"
+			) {
+				const distance =
+					this.config
+						.chatDistance || 3;
 
-				this._moveLane(laneIdx, distance, data.user, {
-					giftName: null,
-					_isChat: true,
-					_comment: comment,
-					_laneFlag: lane?.flag || "",
-				});
+				const lane =
+					this.state.lanes[
+						laneIdx
+					];
 
-				// Check for winner (only during racing)
-				if (phase === "racing") {
+				this._moveLane(
+					laneIdx,
+					distance,
+					data.user,
+					{
+						giftName: null,
+						_isChat: true,
+						_comment: comment,
+						_laneFlag:
+							lane?.flag || "",
+					}
+				);
+
+				// Só verifica vencedor
+				// durante a corrida.
+				if (
+					phase === "racing"
+				) {
 					this._checkFinish();
 				}
 			}
 		} else {
-			// Non-matching chat — just add to feed
 			this._addRecentEvent({
 				type: "chat",
-				nickname: data.user.nickname,
+				nickname:
+					data.user.nickname,
 				text: comment,
 			});
 		}
 	}
 
 	/**
-	 * Process a like event.
-	 * @param {{user: {uniqueId: string, nickname: string}, likeCount: number}} data
+	 * Processa likes.
 	 */
 	handleLike(data) {
 		this._addRecentEvent({
 			type: "like",
-			nickname: data.user.nickname,
+			nickname:
+				data.user.nickname,
 			count: data.likeCount,
 		});
 	}
 
 	// ==========================================
-	// INTERNAL
+	// MOVIMENTO
 	// ==========================================
 
-	/**
-	 * Move a lane forward and track supporter contribution.
-	 * @private
-	 */
-	_moveLane(laneIdx, distance, user, rawData) {
-		const lane = this.state.lanes[laneIdx];
-		if (!lane) return;
+	_moveLane(
+		laneIdx,
+		distance,
+		user,
+		rawData
+	) {
+		const lane =
+			this.state.lanes[laneIdx];
 
-		lane.distance = Math.min(lane.distance + distance, this.config.finishLine);
-
-		// Track supporter
-		const existing = lane.supporters.get(user.uniqueId);
-		if (existing) {
-			existing.totalContrib += distance;
-		} else {
-			lane.supporters.set(user.uniqueId, {
-				nickname: user.nickname,
-				totalContrib: distance,
-			});
+		if (!lane) {
+			return;
 		}
+
+		// Move sem ultrapassar
+		// a linha de chegada.
+		lane.distance = Math.min(
+			lane.distance + distance,
+			this.config.finishLine
+		);
+
+		// ======================================
+		// APOIADORES
+		// ======================================
+
+		const existing =
+			lane.supporters.get(
+				user.uniqueId
+			);
+
+		if (existing) {
+			existing.totalContrib +=
+				distance;
+		} else {
+			lane.supporters.set(
+				user.uniqueId,
+				{
+					nickname:
+						user.nickname,
+					totalContrib:
+						distance,
+				}
+			);
+		}
+
+		// ======================================
+		// EVENTO DE CHAT
+		// ======================================
 
 		if (rawData._isChat) {
-			// Chat vote event
 			this._addRecentEvent({
 				type: "vote",
-				nickname: user.nickname,
-				laneFlag: lane.flag,
-				laneName: lane.name,
+
+				nickname:
+					user.nickname,
+
+				laneFlag:
+					lane.flag,
+
+				laneName:
+					lane.name,
+
 				distance,
-				comment: rawData._comment,
-			});
-		} else {
-			// Gift event
-			this._addRecentEvent({
-				type: "gift",
-				nickname: user.nickname,
-				laneFlag: lane.flag,
-				laneName: lane.name,
-				distance,
-				giftName: rawData.giftName || "",
-				giftEmoji: this.config.getGiftEmoji(rawData.giftName),
+
+				comment:
+					rawData._comment,
 			});
 		}
 
-		this._emit("laneMove", { laneIdx, distance, lane, user });
+		// ======================================
+		// EVENTO DE PRESENTE
+		// ======================================
+
+		else {
+			this._addRecentEvent({
+				type: "gift",
+
+				nickname:
+					user.nickname,
+
+				laneFlag:
+					lane.flag,
+
+				laneName:
+					lane.name,
+
+				distance,
+
+				giftName:
+					rawData.giftName ||
+					"",
+
+				giftEmoji:
+					this.config
+						.getGiftEmoji(
+							rawData.giftName
+						),
+			});
+		}
+
+		this._emit("laneMove", {
+			laneIdx,
+			distance,
+			lane,
+			user,
+		});
 	}
 
-	/** @private */
+	// ==========================================
+	// LINHA DE CHEGADA
+	// ==========================================
+
 	_checkFinish() {
-		for (const lane of this.state.lanes) {
-			if (lane.distance >= this.config.finishLine) {
-				this.state.winner = lane;
-				this._setPhase("finished");
-				this._emit("raceFinished", { winner: lane });
+		// Segurança: só pode haver
+		// vencedor durante a corrida.
+		if (
+			this.state.phase !==
+			"racing"
+		) {
+			return;
+		}
+
+		for (
+			const lane of
+			this.state.lanes
+		) {
+			if (
+				lane.distance >=
+				this.config.finishLine
+			) {
+				this.state.winner =
+					lane;
+
+				this._setPhase(
+					"finished"
+				);
+
+				this._emit(
+					"raceFinished",
+					{
+						winner:
+							lane,
+					}
+				);
+
 				return;
 			}
 		}
 	}
 
-	/** @private — fallback when race times out */
-	_resolveWinner() {
-		let best = this.state.lanes[0];
-		for (const lane of this.state.lanes) {
-			if (lane.distance > best.distance) best = lane;
-		}
-		this.state.winner = best;
-		this._setPhase("finished");
-		this._emit("raceFinished", { winner: best });
-	}
+	// ==========================================
+	// EVENT FEED
+	// ==========================================
 
-	/** @private — keep last 20 events for HUD feed */
 	_addRecentEvent(evt) {
-		evt.timestamp = Date.now();
-		this.state.recentEvents.unshift(evt);
-		if (this.state.recentEvents.length > 20) {
-			this.state.recentEvents.length = 20;
+		evt.timestamp =
+			Date.now();
+
+		this.state.recentEvents.unshift(
+			evt
+		);
+
+		if (
+			this.state.recentEvents
+				.length > 20
+		) {
+			this.state.recentEvents.length =
+				20;
 		}
 	}
 
 	// ==========================================
-	// EVENT EMITTER (simple)
+	// EVENT EMITTER
 	// ==========================================
 
 	on(event, fn) {
-		(this.listeners[event] ??= []).push(fn);
+		(
+			this.listeners[event] ??=
+				[]
+		).push(fn);
 	}
 
 	_emit(event, data) {
-		(this.listeners[event] || []).forEach((fn) => {
+		(
+			this.listeners[event] ||
+			[]
+		).forEach((fn) => {
 			try {
 				fn(data);
 			} catch (e) {
-				console.error(`[RaceEngine] Error in ${event} listener:`, e);
+				console.error(
+					`[RaceEngine] Error in ${event} listener:`,
+					e
+				);
 			}
 		});
 	}
 }
 
-// Export for browser global
-if (typeof module !== "undefined" && module.exports) {
-	module.exports = RaceEngine;
+// ==========================================
+// EXPORT
+// ==========================================
+
+if (
+	typeof module !== "undefined" &&
+	module.exports
+) {
+	module.exports =
+		RaceEngine;
 } else {
-	window.RaceEngine = RaceEngine;
+	window.RaceEngine =
+		RaceEngine;
 }

@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duelo da Live</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="game">
+
+  <!-- TÍTULO E BARRAS DE VIDA -->
+  <header class="hud">
+    <h1>🥊 DUELO DA LIVE</h1>
+
+    <div class="health-bars">
+
+      <div class="health-box">
+        <div class="fighter-name">LULA</div>
+
+        <div class="health-track">
+          <div class="health-fill" id="hpLula"></div>
+        </div>
+
+        <span id="textLula">100 HP</span>
+      </div>
+
+      <div class="health-box right">
+        <div class="fighter-name">FLÁVIO<br>BOLSONARO</div>
+
+        <div class="health-track">
+          <div class="health-fill" id="hpBolsonaro"></div>
+        </div>
+
+        <span id="textBolsonaro">100 HP</span>
+      </div>
+
+    </div>
+
+    <div class="versus">VS</div>
+  </header>
+
+
+  <!-- ARENA -->
+  <main class="arena">
+
+    <!-- CENÁRIO -->
+    <div class="arena-background">
+      <div class="sun"></div>
+      <div class="building left-building"></div>
+      <div class="building right-building"></div>
+      <div class="arena-floor"></div>
+    </div>
+
+
+    <!-- LUTADOR: LULA -->
+    <div class="fighter lula" id="lula">
+
+      <img
+        id="spriteLula"
+        src="sprites/lula/parado-1.png"
+        alt="Lula em pixel art"
+      >
+
+      <div class="placeholder">
+        <div class="head"></div>
+        <div class="torso"></div>
+        <div class="arm"></div>
+        <div class="legs"></div>
+      </div>
+
+      <div class="fighter-shadow"></div>
+
+    </div>
+
+
+    <!-- LUTADOR: BOLSONARO -->
+    <div class="fighter bolsonaro" id="bolsonaro">
+
+      <img
+        id="spriteBolsonaro"
+        src="sprites/bolsonaro/parado-1.png"
+        alt="Bolsonaro em pixel art"
+      >
+
+      <div class="placeholder">
+        <div class="head"></div>
+        <div class="torso"></div>
+        <div class="arm"></div>
+        <div class="legs"></div>
+      </div>
+
+      <div class="fighter-shadow"></div>
+
+    </div>
+
+
+    <!-- EFEITOS DOS GOLPES -->
+    <div id="impact" class="impact"></div>
+
+    <!-- BOLA DE ENERGIA DO ESPECIAL -->
+    <div
+      id="energiaEspecial"
+      class="energia-especial"
+    ></div>
+
+
+    <!-- TELA DE K.O. -->
+    <div id="koOverlay" class="ko-overlay hidden">
+      <div class="ko-title">K.O.!</div>
+      <div id="winnerText" class="winner-text"></div>
+    </div>
+
+  </main>
+
+
+  <!-- PLACAR -->
+  <section class="scoreboard">
+
+    <h2>🏆 VITÓRIAS</h2>
+
+    <div class="score-row">
+
+      <div class="score lula-score">
+        <span>LULA</span>
+        <strong id="winsLula">0</strong>
+      </div>
+
+      <div class="round-box">
+        <span>RODADA</span>
+        <strong id="roundNumber">1</strong>
+      </div>
+
+      <div class="score bolsonaro-score">
+        <span>FLÁVIO<br>BOLSONARO</span>
+        <strong id="winsBolsonaro">0</strong>
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- SOCKET.IO: CONEXÃO COM O SERVIDOR -->
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- MOTOR DO JOGO -->
+<script src="game.js"></script>
+
+<!-- INTEGRAÇÃO COM OS PRESENTES DO TIKTOK -->
+<script src="tiktok-duelo.js"></script>
+
+</body>
+</html>

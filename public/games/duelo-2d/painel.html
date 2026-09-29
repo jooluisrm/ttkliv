@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Presentes — Duelo da Live</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .painel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+      max-width: 1080px;
+      padding: 12px;
+      margin: auto;
+    }
+
+    .equipe {
+      border: 3px solid;
+      border-radius: 15px;
+      padding: 12px;
+      background: rgba(13, 20, 38, 0.95);
+      overflow: hidden;
+    }
+
+    .lula {
+      border-color: #ff4040;
+      box-shadow: 0 0 16px rgba(255, 40, 40, 0.4);
+    }
+
+    .flavio {
+      border-color: #348cff;
+      box-shadow: 0 0 16px rgba(52, 140, 255, 0.4);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      padding: 9px 5px;
+      text-align: center;
+      font-size: clamp(15px, 2.5vw, 25px);
+      text-shadow: 2px 2px #000;
+      border-radius: 7px;
+    }
+
+    .lula h2 {
+      background: #a92132;
+    }
+
+    .flavio h2 {
+      background: #2053a0;
+    }
+
+    .presente {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 6px;
+      min-height: 88px;
+      border-bottom: 1px solid #46526c;
+    }
+
+    .presente:last-child {
+      border-bottom: none;
+    }
+
+    .presente img {
+      width: clamp(40px, 7vw, 74px);
+      height: clamp(40px, 7vw, 74px);
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .informacoes {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .nome {
+      font-size: clamp(12px, 1.8vw, 19px);
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .golpe {
+      margin-top: 5px;
+      font-size: clamp(11px, 1.5vw, 16px);
+      color: #d5def0;
+    }
+
+    .moedas {
+      flex-shrink: 0;
+      padding: 6px 8px;
+      background: #37290b;
+      color: #ffd84c;
+      border: 1px solid #eabf38;
+      border-radius: 8px;
+      font-size: clamp(11px, 1.5vw, 16px);
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 520px) {
+      .painel {
+        gap: 6px;
+        padding: 4px;
+      }
+
+      .equipe {
+        padding: 5px;
+        border-width: 2px;
+      }
+
+      .presente {
+        gap: 4px;
+        padding: 5px 2px;
+        flex-wrap: wrap;
+      }
+
+      .moedas {
+        margin-left: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="painel">
+
+    <!-- TABELA DO LULA -->
+    <section class="equipe lula">
+      <h2>LULA</h2>
+
+      <div class="presente">
+        <img src="icones/rose.webp" alt="Rose">
+        <div class="informacoes">
+          <div class="nome">Rose</div>
+          <div class="golpe">🥊 Soco — 5 HP</div>
+        </div>
+        <div class="moedas">1 🪙</div>
+      </div>
+
+      <div class="presente">
+        <img src="icones/tiny-diny.webp" alt="Tiny Diny">
+        <div class="informacoes">
+          <div class="nome">Mini Dino</div>
+          <div class="golpe">🥊 Combo — 20 HP</div>
+        </div>
+        <div class="moedas">10 🪙</div>
+      </div>
+
+      <div class="presente">
+        <img src="icones/confetti.webp" alt="Confetti">
+        <div class="informacoes">
+          <div class="nome">Confetti</div>
+          <div class="golpe">💥 Especial — K.O.</div>
+        </div>
+        <div class="moedas">100 🪙</div>
+      </div>
+    </section>
+
+    <!-- TABELA DO FLÁVIO -->
+    <section class="equipe flavio">
+      <h2>FLÁVIO BOLSONARO</h2>
+
+      <div class="presente">
+        <img src="icones/gg.webp" alt="GG">
+        <div class="informacoes">
+          <div class="nome">GG</div>
+          <div class="golpe">🥊 Soco — 5 HP</div>
+        </div>
+        <div class="moedas">1 🪙</div>
+      </div>
+
+      <div class="presente">
+        <img src="icones/heart.webp" alt="Heart">
+        <div class="informacoes">
+          <div class="nome">Coração</div>
+          <div class="golpe">🥊 Combo — 20 HP</div>
+        </div>
+        <div class="moedas">10 🪙</div>
+      </div>
+
+      <div class="presente">
+        <img
+          src="icones/heart-my-earthling.webp"
+          alt="Amo Meu Terráqueo"
+        >
+        <div class="informacoes">
+          <div class="nome">Amo Meu Terráqueo</div>
+          <div class="golpe">💥 Especial — K.O.</div>
+        </div>
+        <div class="moedas">100 🪙</div>
+      </div>
+    </section>
+
+  </div>
+
+</body>
+</html>

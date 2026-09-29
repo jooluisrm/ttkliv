@@ -10,7 +10,10 @@
  * @module services/TikTokService
  */
 
-import { WebcastPushConnection } from "tiktok-live-connector";
+import {
+    TikTokLiveConnection,
+    WebcastEvent
+} from "tiktok-live-connector";
 import {
 	normalizeChat,
 	normalizeGift,
@@ -75,13 +78,10 @@ class TikTokService {
 
 		try {
 			// Create new TikTok Live connection
-			const connection = new WebcastPushConnection(username, {
-				processInitialData: true,
-				enableExtendedGiftInfo: true,
-				enableWebsocketUpgrade: true,
-				requestPollingIntervalMs: 2000,
-				sessionId: null,
-			});
+const connection = new TikTokLiveConnection(username, {
+    processInitialData: false,
+    enableExtendedGiftInfo: false,
+});
 
 			// Store in Map
 			this.connections.set(username, {
@@ -125,14 +125,65 @@ class TikTokService {
 			});
 
 			/** Handle Gift Events — single canonical emit, no legacy duplication */
-			connection.on("gift", (data) => {
-				this.updateActivity(username);
-				const payload = normalizeGift(data);
-				io.to(username).emit("tiktok_gift", payload);
-				console.log(
-					`[${username}] Gift: ${payload.giftName} x${payload.repeatCount} (${payload.giftType}, ${payload.giftValue}💎)`,
-				);
-			});
+			
+connection.on("gift", (data) => {
+    this.updateActivity(username);
+
+    const payload = normalizeGift(data);
+
+    const presente = {
+    ...payload,
+
+    giftId:
+        data.giftId ??
+        data.giftDetails?.giftId ??
+        data.gift?.gift_id ??
+        payload.giftId,
+
+    giftName:
+        data.giftDetails?.giftName ??
+        data.giftName ??
+        data.gift?.name ??
+        payload.giftName,
+
+    repeatCount:
+        data.repeatCount ??
+        payload.repeatCount ??
+        1,
+
+    repeatEnd:
+        data.repeatEnd ??
+        data.gift?.repeat_end ??
+        payload.repeatEnd,
+
+    rawGiftType:
+    data.giftDetails?.giftType ??
+    data.giftType ??
+    data.gift?.gift_type ??
+    payload.giftType,
+
+groupId:
+    data.groupId ??
+    data.gift?.group_id ??
+    null,
+
+eventId:
+    data.msgId ??
+    data.monitorExtra?.msg_id ??
+    null
+};
+
+    // Envia o presente apenas para a sala
+    // da conta correspondente.
+    io.to(username).emit("tiktok_gift", presente);
+
+    console.log(
+        `[${username}] Presente: ` +
+        `${presente.giftName} | ` +
+        `ID: ${presente.giftId} | ` +
+        `Quantidade: ${presente.repeatCount}`
+    );
+});
 
 			// ==========================================
 			// CONNECTION STATUS HANDLERS

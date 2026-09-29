@@ -1,267 +1,502 @@
 /**
  * style.css
- * Horse Racing OBS overlay styles.
- * Transparent background — only race elements are visible in OBS.
+ * Horse Racing - interface da corrida
  */
 
 /* ==========================================
-   RESET & BASE
+   RESET
    ========================================== */
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 html,
 body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: transparent;
-  font-family: "Segoe UI", "Inter", system-ui, sans-serif;
-  color: #fff;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	background: transparent;
+
+	font-family:
+		"Segoe UI",
+		"Inter",
+		Arial,
+		sans-serif;
+
+	color: #ffffff;
 }
 
 /* ==========================================
-   CANVAS — fills entire viewport
+   CANVAS
    ========================================== */
+
 #raceCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+	position: fixed;
+
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	z-index: 1;
 }
 
 /* ==========================================
-   HUD — sits on top of canvas
+   HUD
    ========================================== */
+
 #hud {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  pointer-events: none;
+	position: fixed;
+
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	z-index: 10;
+
+	pointer-events: none;
 }
 
 /* ==========================================
-   PHASE BANNER — top center
+   BANNER SUPERIOR
    ========================================== */
+
 .phase-banner {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  padding: 10px 30px;
-  border-radius: 12px;
-  font-size: 22px;
-  font-weight: 700;
-  text-align: center;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	position: absolute;
+
+	top: 20px;
+	left: 50%;
+
+	transform: translateX(-50%);
+
+	display: flex;
+
+	align-items: center;
+	justify-content: center;
+
+	gap: 12px;
+
+	padding: 10px 26px;
+
+	background: rgba(0, 0, 0, 0.72);
+
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 12px;
+
+	backdrop-filter: blur(8px);
+
+	font-size: 20px;
+	font-weight: 700;
+
+	text-align: center;
+
+	text-shadow:
+		0 2px 4px
+		rgba(0, 0, 0, 0.6);
+
+	white-space: nowrap;
 }
 
 #phaseTimer {
-  font-variant-numeric: tabular-nums;
-  color: #ffd700;
-  min-width: 40px;
+	color: #ffd700;
+
+	font-variant-numeric: tabular-nums;
+
+	min-width: 40px;
 }
 
 /* ==========================================
-   LANE LABELS — left side, vertically stacked
+   CARDS LATERAIS
    ========================================== */
+
 #laneLabels {
-  position: absolute;
-  top: 50%;
-  left: 15px;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.lane-label {
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-weight: 600;
-  border-left: 5px solid;
-  white-space: nowrap;
-  min-width: 240px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.lane-label .lane-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.lane-label .lane-flag {
-  font-size: 22px;
-}
-
-.lane-label .lane-name {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.lane-label .lane-vote {
-  font-size: 11px;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffd700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 0.5px;
-}
-
-.lane-label .lane-dist {
-  margin-left: auto;
-  font-variant-numeric: tabular-nums;
-  font-size: 15px;
-  font-weight: 700;
-  color: #ffd700;
-}
-
-.lane-label .lane-gifts {
-  display: flex;
-  gap: 6px;
-  font-size: 26px;
-  line-height: 1.1;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
+	display: none !important;
 }
 
 /* ==========================================
-   EVENT FEED — bottom right
+   FEED
    ========================================== */
+
 #eventFeed {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 320px;
-  max-height: 220px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+	position: absolute;
+
+	right: 18px;
+	bottom: 18px;
+
+	width: min(
+		310px,
+		calc(100vw - 36px)
+	);
+
+	max-height: 150px;
+
+	display: flex;
+	flex-direction: column;
+
+	gap: 5px;
+
+	overflow: hidden;
+
+	z-index: 30;
 }
 
 .feed-item {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  animation: fadeIn 0.3s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	width: 100%;
+
+	padding: 6px 11px;
+
+	background: rgba(0, 0, 0, 0.72);
+
+	border-radius: 7px;
+
+	backdrop-filter: blur(5px);
+
+	font-size: 12px;
+	font-weight: 600;
+
+	line-height: 1.25;
+
+	white-space: nowrap;
+
+	overflow: hidden;
+
+	text-overflow: ellipsis;
+
+	box-shadow:
+		0 3px 10px
+		rgba(0, 0, 0, 0.25);
+
+	animation:
+		feedEnter
+		0.25s ease;
 }
 
 .feed-item.gift {
-  border-left: 3px solid #f4a;
-}
-.feed-item.vote {
-  border-left: 3px solid #ffd700;
-}
-.feed-item.chat {
-  border-left: 3px solid #4af;
-}
-.feed-item.like {
-  border-left: 3px solid #af4;
+	border-left: 3px solid #ff44aa;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.feed-item.vote {
+	border-left: 3px solid #ffd700;
+}
+
+.feed-item.chat {
+	border-left: 3px solid #44aaff;
+}
+
+.feed-item.like {
+	border-left: 3px solid #aaff44;
 }
 
 /* ==========================================
-   WINNER OVERLAY
+   ANIMAÇÃO DO FEED
    ========================================== */
+
+@keyframes feedEnter {
+
+	from {
+		opacity: 0;
+
+		transform: translateX(15px);
+	}
+
+	to {
+		opacity: 1;
+
+		transform: translateX(0);
+	}
+}
+
+/* ==========================================
+   VENCEDOR
+   ========================================== */
+
 .winner-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.5s ease;
+	position: absolute;
+
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+
+	align-items: center;
+	justify-content: center;
+
+	background: rgba(0, 0, 0, 0.60);
+
+	backdrop-filter: blur(5px);
+
+	z-index: 100;
+
+	animation:
+		winnerFade
+		0.4s ease;
 }
 
 .winner-overlay.hidden {
-  display: none;
+	display: none;
 }
 
 .winner-content {
-  text-align: center;
-  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+	text-align: center;
+
+	padding: 30px;
+
+	animation:
+		winnerPop
+		0.4s
+		cubic-bezier(
+			0.34,
+			1.56,
+			0.64,
+			1
+		);
 }
 
 .winner-emoji {
-  font-size: 80px;
-  margin-bottom: 10px;
+	font-size: 70px;
+
+	margin-bottom: 8px;
 }
 
 .winner-name {
-  font-size: 48px;
-  font-weight: 800;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  margin-bottom: 8px;
+	font-size:
+		clamp(
+			28px,
+			5vw,
+			48px
+		);
+
+	font-weight: 800;
+
+	text-shadow:
+		0 4px 12px
+		rgba(0, 0, 0, 0.7);
+
+	margin-bottom: 8px;
 }
 
 .winner-supporters {
-  font-size: 18px;
-  opacity: 0.8;
-}
+	font-size: 17px;
 
-@keyframes popIn {
-  from {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+	opacity: 0.85;
 }
 
 /* ==========================================
-   COUNTDOWN PULSE
+   ANIMAÇÕES DO VENCEDOR
    ========================================== */
-.phase-banner.countdown {
-  animation: pulse 1s ease-in-out infinite;
+
+@keyframes winnerFade {
+
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    transform: translateX(-50%) scale(1);
-  }
-  50% {
-    transform: translateX(-50%) scale(1.05);
-  }
+@keyframes winnerPop {
+
+	from {
+		transform: scale(0.6);
+
+		opacity: 0;
+	}
+
+	to {
+		transform: scale(1);
+
+		opacity: 1;
+	}
+}
+
+/* ==========================================
+   COUNTDOWN
+   ========================================== */
+
+.phase-banner.countdown {
+	animation:
+		countdownPulse
+		1s ease-in-out
+		infinite;
+}
+
+@keyframes countdownPulse {
+
+	0%,
+	100% {
+		transform:
+			translateX(-50%)
+			scale(1);
+	}
+
+	50% {
+		transform:
+			translateX(-50%)
+			scale(1.05);
+	}
+}/* ==========================================
+   TELAS PEQUENAS
+   ========================================== */
+
+@media (max-width: 700px) {
+
+	.phase-banner {
+		top: 12px;
+
+		padding: 8px 15px;
+
+		font-size: 15px;
+
+		max-width: calc(100vw - 24px);
+	}
+
+	#eventFeed {
+		right: 10px;
+		bottom: 10px;
+
+		width: 240px;
+
+		max-height: 130px;
+	}
+
+	.feed-item {
+		font-size: 11px;
+
+		padding: 5px 9px;
+	}
+}
+
+
+/* ==========================================
+   PLACAR DE VITÓRIAS
+   ========================================== */
+
+/* ==========================================
+   PLACAR DE VITÓRIAS — HORIZONTAL
+   ========================================== */
+
+#victoryBoard {
+	position: fixed;
+
+	/* Fica abaixo do banner e acima da pista */
+	top: 82px;
+	left: 50%;
+
+	transform: translateX(-50%);
+
+	width: auto;
+	min-width: 520px;
+
+	padding: 7px 10px;
+
+	display: flex !important;
+	align-items: center;
+	gap: 10px;
+
+	background: rgba(5, 10, 20, 0.90);
+
+	border: 1px solid rgba(255, 215, 0, 0.45);
+	border-radius: 10px;
+
+	box-shadow:
+		0 4px 15px rgba(0, 0, 0, 0.45);
+
+	backdrop-filter: blur(8px);
+
+	z-index: 9999;
+
+	pointer-events: none;
+}
+
+
+/* TÍTULO */
+
+.victory-title {
+	color: #ffd700;
+
+	font-size: 12px;
+	font-weight: 900;
+
+	white-space: nowrap;
+
+	padding-right: 10px;
+
+	border-right:
+		1px solid
+		rgba(255, 255, 255, 0.15);
+}
+
+
+/* LISTA HORIZONTAL */
+
+#victoryList {
+	display: flex;
+
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 7px;
+}
+
+
+/* PARTICIPANTE */
+
+.victory-item {
+	display: flex;
+
+	align-items: center;
+
+	gap: 6px;
+
+	height: 27px;
+
+	padding: 4px 8px;
+
+	background:
+		rgba(255, 255, 255, 0.06);
+
+	border-radius: 6px;
+
+	font-size: 10px;
+	font-weight: 700;
+
+	white-space: nowrap;
+}
+
+
+/* NOME */
+
+.victory-player {
+	overflow: hidden;
+
+	text-overflow: ellipsis;
+
+	white-space: nowrap;
+
+	max-width: 105px;
+}
+
+
+/* NÚMERO DE VITÓRIAS */
+
+.victory-count {
+	color: #ffd700;
+
+	font-size: 12px;
+	font-weight: 900;
+
+	margin-left: 2px;
 }

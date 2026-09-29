@@ -12,13 +12,26 @@
  * @returns {{uniqueId: string, nickname: string, profilePictureUrl: string}}
  */
 export function normalizeUser(raw) {
-	return {
-		uniqueId: raw.uniqueId || "",
-		nickname: raw.nickname || raw.uniqueId || "Anonymous",
-		profilePictureUrl: raw.profilePictureUrl || "",
-	};
-}
+  const usuario = raw.user ?? raw;
 
+  return {
+    uniqueId:
+      usuario.uniqueId ||
+      raw.uniqueId ||
+      "",
+
+    nickname:
+      usuario.nickname ||
+      raw.nickname ||
+      usuario.uniqueId ||
+      "Anonymous",
+
+    profilePictureUrl:
+      usuario.profilePictureUrl ||
+      raw.profilePictureUrl ||
+      ""
+  };
+}
 /**
  * Normalize chat event.
  * @param {Object} raw - Raw chat event
