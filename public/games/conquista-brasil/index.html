@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Domínio do Brasil</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+</head>
+
+<body>
+
+  <div id="game">
+
+    <!-- ========================= -->
+    <!-- HUD -->
+    <!-- ========================= -->
+
+    <header class="hud">
+
+      <h1>DOMÍNIO DO BRASIL</h1>
+
+      <div class="times">
+
+        <!-- LULA -->
+        <div class="time time-lula">
+
+          <span class="nome">
+            LULA
+          </span>
+
+          <strong id="progressoLula">
+            0 / 200%
+          </strong>
+
+          <span class="vitorias">
+            🏆
+            <span id="vitoriasLula">
+              0
+            </span>
+          </span>
+
+        </div>
+
+
+        <!-- VS -->
+        <div class="versus">
+          VS
+        </div>
+
+
+        <!-- FLÁVIO -->
+        <div class="time time-flavio">
+
+          <span class="nome nome-flavio-colorido">
+            <span class="verde">F</span>
+            <span class="amarelo">L</span>
+            <span class="verde">Á</span>
+            <span class="amarelo">V</span>
+            <span class="verde">I</span>
+            <span class="amarelo">O</span>
+          </span>
+
+          <strong id="progressoFlavio">
+            0 / 200%
+          </strong>
+
+          <span class="vitorias">
+            🏆
+            <span id="vitoriasFlavio">
+              0
+            </span>
+          </span>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- ========================= -->
+    <!-- ARENA -->
+    <!-- ========================= -->
+
+    <main class="arena">
+
+      <div class="titulo-mapa">
+        DOMINE O BRASIL
+      </div>
+
+
+      <!-- MAPA -->
+      <div
+        id="mapaBrasil"
+        class="mapa-brasil"
+      >
+
+        <!-- MAPA NEUTRO -->
+        <div
+          id="camadaNeutra"
+          class="camada-mapa neutro-camada"
+        ></div>
+
+
+        <!-- FLÁVIO -->
+        <div
+          id="camadaFlavio"
+          class="camada-mapa flavio-camada"
+        ></div>
+
+
+        <!-- LULA -->
+        <div
+          id="camadaLula"
+          class="camada-mapa lula-camada"
+        ></div>
+
+      </div>
+
+
+      <!-- LEGENDA -->
+      <div class="legenda">
+
+        <div class="legenda-flavio">
+          <img
+            src="imagens/bandeira-brasil.webp"
+            alt="Bandeira do Brasil"
+            class="bandeira-mini"
+          >
+          <span>FLÁVIO</span>
+        </div>
+
+        <div class="legenda-lula">
+          ★ LULA
+        </div>
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- VITÓRIA -->
+      <!-- ========================= -->
+
+      <div
+        id="vitoriaOverlay"
+        class="vitoria-overlay hidden"
+      >
+
+        <div
+          id="vitoriaTexto"
+          class="vitoria-texto"
+        >
+          O BRASIL É DO LULA!
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+  <script src="tiktok-dominio.js"></script>
+
+</body>
+
+</html>

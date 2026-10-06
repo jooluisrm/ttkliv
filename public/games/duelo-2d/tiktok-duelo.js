@@ -3,8 +3,7 @@
  // DUELO DA LIVE — PRESENTES DO TIKTOK
  // ========================================
 
-const TIKTOK_USERNAME = "ougusto9";
-
+const TIKTOK_USERNAME = process.env.TIKTOK_USERNAME || "ougusto9";
 // Mantém os mesmos seis presentes e golpes.
 const PRESENTES_DUELO = {
   5655: {

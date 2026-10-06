@@ -19,6 +19,10 @@ const fighters = {
 };
 
 
+// ========================================
+// ATAQUES
+// ========================================
+
 const attacks = {
   soco: {
     damage: 5,
@@ -56,15 +60,11 @@ const sounds = {
   ko: new Audio("sons/ko.mp3")
 };
 
-
-// VOLUME DOS SONS
 sounds.soco.volume = 0.65;
 sounds.especial.volume = 0.8;
 sounds.ko.volume = 0.3;
 
 
-// Permite tocar o mesmo som várias vezes,
-// importante para os golpes do combo.
 function playSound(name) {
 
   const original = sounds[name];
@@ -78,14 +78,11 @@ function playSound(name) {
   audio.volume = original.volume;
 
   audio.play().catch(error => {
-
     console.warn(
       `[Duelo] Não foi possível tocar o som "${name}":`,
       error
     );
-
   });
-
 }
 
 
@@ -94,7 +91,6 @@ function playSound(name) {
 // ========================================
 
 const animations = {
-
   lula: {
     parado: 4,
     soco: 3,
@@ -110,19 +106,25 @@ const animations = {
     especial: 4,
     ko: 4
   }
-
 };
 
 
 const animationTimers = {};
 
+const animationTokens = {
+  lula: 0,
+  bolsonaro: 0
+};
+
+
+// ========================================
+// FILA DE ATAQUES
+// ========================================
+
 const attackQueue = [];
 
-
 let busy = false;
-
 let round = 1;
-
 let roundEnding = false;
 
 
@@ -131,34 +133,26 @@ let roundEnding = false;
 // ========================================
 
 function sleep(ms) {
-
   return new Promise(resolve => setTimeout(resolve, ms));
-
 }
 
 
 function getOpponent(name) {
-
   return name === "lula"
     ? "bolsonaro"
     : "lula";
-
 }
 
 
 function getDisplayName(name) {
-
   return name === "lula"
     ? "LULA"
     : "FLÁVIO BOLSONARO";
-
 }
 
 
 function spritePath(name, action, frame) {
-
   return `sprites/${name}/${action}-${frame}.png`;
-
 }
 
 
@@ -172,27 +166,20 @@ function checkSprites() {
 
     const img = new Image();
 
-
     img.onload = () => {
 
       fighter.element.classList.add("has-sprite");
 
       fighter.sprite.src = img.src;
 
-      playAnimation(
-        name,
-        "parado"
-      );
-
+      playAnimation(name, "parado");
     };
 
 
     img.onerror = () => {
-
       console.warn(
         `[Duelo] Sprite de ${name} não encontrado.`
       );
-
     };
 
 
@@ -201,26 +188,31 @@ function checkSprites() {
       "parado",
       1
     );
-
   }
-
 }
 
 
 // ========================================
-// CONTROLE DE ANIMAÇÕES
+// PARAR ANIMAÇÃO
 // ========================================
 
 function stopAnimation(name) {
 
-  clearInterval(
-    animationTimers[name]
-  );
+  if (animationTimers[name]) {
 
-  animationTimers[name] = null;
+    clearInterval(animationTimers[name]);
 
+    animationTimers[name] = null;
+  }
+
+  // Invalida qualquer animação antiga.
+  animationTokens[name]++;
 }
 
+
+// ========================================
+// ANIMAÇÃO CONTÍNUA
+// ========================================
 
 function playAnimation(
   name,
@@ -230,15 +222,11 @@ function playAnimation(
 
   const fighter = fighters[name];
 
-
   if (
-    !fighter.element.classList.contains(
-      "has-sprite"
-    )
+    !fighter ||
+    !fighter.element.classList.contains("has-sprite")
   ) {
-
     return;
-
   }
 
 
@@ -250,10 +238,12 @@ function playAnimation(
 
 
   if (!frameCount) {
-
     return;
-
   }
+
+
+  const token =
+    animationTokens[name];
 
 
   const frameDelay =
@@ -276,6 +266,20 @@ function playAnimation(
   animationTimers[name] =
     setInterval(() => {
 
+      if (
+        token !== animationTokens[name]
+      ) {
+
+        clearInterval(
+          animationTimers[name]
+        );
+
+        animationTimers[name] = null;
+
+        return;
+      }
+
+
       frame++;
 
 
@@ -285,38 +289,16 @@ function playAnimation(
 
           frame = 1;
 
-        }
+        } else {
 
-        else {
+          clearInterval(
+            animationTimers[name]
+          );
 
-          stopAnimation(name);
-
-
-          if (action === "ko") {
-
-            fighter.sprite.src =
-              spritePath(
-                name,
-                "ko",
-                frameCount
-              );
-
-          }
-
-          else {
-
-            playAnimation(
-              name,
-              "parado"
-            );
-
-          }
-
+          animationTimers[name] = null;
 
           return;
-
         }
-
       }
 
 
@@ -327,9 +309,101 @@ function playAnimation(
           frame
         );
 
-
     }, frameDelay);
+}
 
+
+// ========================================
+// ANIMAÇÃO DE ATAQUE SINCRONIZADA
+// ========================================
+
+async function playAttackAnimation(
+  name,
+  action,
+  duration
+) {
+
+  const fighter = fighters[name];
+
+
+  if (
+    !fighter ||
+    !fighter.element.classList.contains("has-sprite")
+  ) {
+
+    await sleep(duration);
+    return;
+  }
+
+
+  stopAnimation(name);
+
+
+  const token =
+    animationTokens[name];
+
+
+  const frameCount =
+    animations[name][action];
+
+
+  if (!frameCount) {
+
+    await sleep(duration);
+    return;
+  }
+
+
+  const frameDelay =
+    duration / frameCount;
+
+
+  for (
+    let frame = 1;
+    frame <= frameCount;
+    frame++
+  ) {
+
+    if (
+      token !== animationTokens[name]
+    ) {
+      return;
+    }
+
+
+    fighter.sprite.src =
+      spritePath(
+        name,
+        action,
+        frame
+      );
+
+
+    await sleep(frameDelay);
+  }
+}
+
+
+// ========================================
+// VOLTAR PARA PARADO
+// ========================================
+
+function voltarParaParado(name) {
+
+  const fighter = fighters[name];
+
+  if (!fighter) {
+    return;
+  }
+
+  if (fighter.hp <= 0) {
+    return;
+  }
+
+  playAnimation(
+    name,
+    "parado"
+  );
 }
 
 
@@ -350,41 +424,29 @@ function atualizarCorVida(
   );
 
 
-  // VERDE
   if (hp >= 60) {
 
     barra.classList.add(
       "hp-alto"
     );
 
-  }
-
-
-  // AMARELO
-  else if (hp >= 30) {
+  } else if (hp >= 30) {
 
     barra.classList.add(
       "hp-medio"
     );
 
-  }
-
-
-  // VERMELHO
-  else {
+  } else {
 
     barra.classList.add(
       "hp-baixo"
     );
-
   }
 
 
-  // Reinicia animação
   void barra.offsetWidth;
 
 
-  // Pisca ao perder vida
   barra.classList.add(
     "hp-dano"
   );
@@ -397,7 +459,6 @@ function atualizarCorVida(
     );
 
   }, 180);
-
 }
 
 
@@ -424,40 +485,33 @@ function updateHUD() {
       );
 
 
-    // TAMANHO DA BARRA
     barraVida.style.width =
       fighter.hp + "%";
 
 
-    // COR DA BARRA
     atualizarCorVida(
       barraVida,
       fighter.hp
     );
 
 
-    // TEXTO DO HP
     document.getElementById(
       "text" + suffix
     ).textContent =
       fighter.hp + " HP";
 
 
-    // VITÓRIAS
     document.getElementById(
       "wins" + suffix
     ).textContent =
       fighter.wins;
-
   }
 
 
-  // RODADA
   document.getElementById(
     "roundNumber"
   ).textContent =
     round;
-
 }
 
 
@@ -493,7 +547,6 @@ function showImpact(
   impact.classList.add(
     type + "-impacto"
   );
-
 }
 
 
@@ -513,7 +566,6 @@ function clearImpact() {
     "combo-impacto",
     "especial-impacto"
   );
-
 }
 
 
@@ -530,7 +582,6 @@ function showHit(name) {
       "hit",
       "recebendo-soco"
     );
-
 }
 
 
@@ -543,10 +594,46 @@ function clearHit(name) {
       "hit",
       "recebendo-soco"
     );
-
 }
 
 
+// ========================================
+// APLICAR IMPACTO
+// ========================================
+
+function aplicarImpacto(
+  opponentName,
+  damage,
+  type
+) {
+
+  const opponent =
+    fighters[opponentName];
+
+
+  opponent.hp =
+    Math.max(
+      0,
+      opponent.hp - damage
+    );
+
+
+  playSound("soco");
+
+
+  showHit(
+    opponentName
+  );
+
+
+  showImpact(
+    "-" + damage,
+    type
+  );
+
+
+  updateHUD();
+}
 // ========================================
 // ENERGIA DO ESPECIAL
 // ========================================
@@ -566,26 +653,19 @@ function getSpecialEnergy() {
         "div"
       );
 
-
     energy.id =
       "energiaEspecial";
-
 
     energy.className =
       "energia-especial";
 
-
     document
       .querySelector(".arena")
-      .appendChild(
-        energy
-      );
-
+      .appendChild(energy);
   }
 
 
   return energy;
-
 }
 
 
@@ -598,16 +678,13 @@ async function dispararEspecial(name) {
   const energy =
     getSpecialEnergy();
 
-
   const arena =
     document.querySelector(
       ".arena"
     );
 
-
   const source =
     fighters[name].element;
-
 
   const target =
     fighters[
@@ -618,10 +695,8 @@ async function dispararEspecial(name) {
   const arenaRect =
     arena.getBoundingClientRect();
 
-
   const sourceRect =
     source.getBoundingClientRect();
-
 
   const targetRect =
     target.getBoundingClientRect();
@@ -656,7 +731,6 @@ async function dispararEspecial(name) {
 
   energy.style.left =
     start + "px";
-
 
   energy.style.top =
     top + "px";
@@ -700,7 +774,6 @@ async function dispararEspecial(name) {
   arena.classList.remove(
     "tremendo"
   );
-
 }
 
 
@@ -725,65 +798,51 @@ function attack(
       type
     );
 
-
     return;
-
   }
 
 
+  // Cada presente vira UMA entrada independente
+  // na fila. Não executamos vários golpes juntos.
   attackQueue.push({
-
     name,
-
     type,
-
     origem
-
   });
 
 
   console.log(
     "[DUELO] Ataque recebido:",
     {
-
       personagem: name,
-
       golpe: type,
-
       origem: origem,
-
       rodada: round,
-
       ataquesNaFila:
         attackQueue.length,
-
       horario:
-        new Date()
-          .toISOString()
-
+        new Date().toISOString()
     }
-
   );
 
 
   processQueue();
-
 }
 
 
 // ========================================
-// FILA DE ATAQUES
+// PROCESSAR FILA
 // ========================================
 
 async function processQueue() {
 
+  // Se já existe um golpe acontecendo,
+  // o novo presente simplesmente aguarda.
   if (
     busy ||
     roundEnding
   ) {
-
     return;
-
   }
 
 
@@ -792,9 +851,7 @@ async function processQueue() {
 
 
   if (!next) {
-
     return;
-
   }
 
 
@@ -808,32 +865,27 @@ async function processQueue() {
       next.type
     );
 
-  }
-
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "[DUELO] Erro ao executar ataque:",
       error
     );
 
-  }
-
-
-  finally {
+  } finally {
 
     busy = false;
 
 
     if (!roundEnding) {
 
+      // Libera um ciclo do navegador antes
+      // de executar o próximo presente.
+      await sleep(0);
+
       processQueue();
-
     }
-
   }
-
 }
 
 
@@ -849,14 +901,11 @@ async function executeAttack(
   const attacker =
     fighters[name];
 
-
   const opponentName =
     getOpponent(name);
 
-
   const opponent =
     fighters[opponentName];
-
 
   const move =
     attacks[type];
@@ -864,26 +913,43 @@ async function executeAttack(
 
   if (
     attacker.hp <= 0 ||
-    opponent.hp <= 0
+    opponent.hp <= 0 ||
+    roundEnding
   ) {
-
     return;
-
   }
 
 
-  attacker.element.classList.add(
-    "attacking",
-    move.cssClass,
-    move.movementClass
-  );
+  // Limpa resíduos do golpe anterior.
+  clearHit(opponentName);
+  clearImpact();
 
 
-  playAnimation(
-    name,
-    move.animation,
-    move.duration
-  );
+  attacker.element
+    .classList
+    .remove(
+      "punch",
+      "combo",
+      "special",
+      "soco-avancando",
+      "combo-avancando",
+      "especial-avancando",
+      "especial-energia"
+    );
+
+
+  // Força o navegador a registrar a remoção
+  // antes de adicionar a animação novamente.
+  void attacker.element.offsetWidth;
+
+
+  attacker.element
+    .classList
+    .add(
+      "attacking",
+      move.cssClass,
+      move.movementClass
+    );
 
 
   // ========================================
@@ -892,44 +958,46 @@ async function executeAttack(
 
   if (type === "soco") {
 
-    await sleep(250);
-
-
-    opponent.hp =
-      Math.max(
-        0,
-        opponent.hp - 5
+    const animationPromise =
+      playAttackAnimation(
+        name,
+        "soco",
+        move.duration
       );
 
 
-    // SOM DO SOCO
-    playSound("soco");
+    // 3 frames em 450ms.
+    // O dano acontece junto do frame final.
+    await sleep(300);
 
 
-    showHit(
-      opponentName
-    );
+    if (
+      !roundEnding &&
+      attacker.hp > 0 &&
+      opponent.hp > 0
+    ) {
+
+      aplicarImpacto(
+        opponentName,
+        move.damage,
+        "soco"
+      );
+    }
 
 
-    showImpact(
-      "-5",
-      "soco"
-    );
-
-
-    updateHUD();
-
-
-    await sleep(200);
+    await sleep(150);
 
 
     clearHit(
       opponentName
     );
 
-
     clearImpact();
 
+
+    // Não libera o próximo presente
+    // até a animação terminar.
+    await animationPromise;
   }
 
 
@@ -937,9 +1005,21 @@ async function executeAttack(
   // COMBO
   // ========================================
 
-  else if (
-    type === "combo"
-  ) {
+  else if (type === "combo") {
+
+    const animationPromise =
+      playAttackAnimation(
+        name,
+        "combo",
+        move.duration
+      );
+
+
+    // 20 de dano total:
+    // 4 impactos de 5.
+    const danoPorImpacto =
+      move.damage / 4;
+
 
     for (
       let i = 0;
@@ -950,29 +1030,20 @@ async function executeAttack(
       await sleep(250);
 
 
-      opponent.hp =
-        Math.max(
-          0,
-          opponent.hp - 5
-        );
+      if (
+        roundEnding ||
+        attacker.hp <= 0 ||
+        opponent.hp <= 0
+      ) {
+        break;
+      }
 
 
-      // SOM EM CADA IMPACTO
-      playSound("soco");
-
-
-      showHit(
-        opponentName
-      );
-
-
-      showImpact(
-        "-5",
+      aplicarImpacto(
+        opponentName,
+        danoPorImpacto,
         "combo"
       );
-
-
-      updateHUD();
 
 
       await sleep(75);
@@ -982,20 +1053,20 @@ async function executeAttack(
         opponentName
       );
 
-
       clearImpact();
 
 
       if (
-        opponent.hp === 0
+        opponent.hp <= 0
       ) {
-
         break;
-
       }
-
     }
 
+
+    // Mesmo que os quatro impactos já tenham
+    // ocorrido, espera a animação visual acabar.
+    await animationPromise;
   }
 
 
@@ -1003,11 +1074,34 @@ async function executeAttack(
   // ESPECIAL
   // ========================================
 
-  else if (
-    type === "especial"
-  ) {
+  else if (type === "especial") {
 
-    await sleep(1000);
+    const animationPromise =
+      playAttackAnimation(
+        name,
+        move.animation,
+        1000
+      );
+
+
+    // Primeiro termina a preparação visual.
+    await animationPromise;
+
+
+    if (
+      roundEnding ||
+      attacker.hp <= 0 ||
+      opponent.hp <= 0
+    ) {
+
+      limparAtaque(
+        name,
+        opponentName,
+        move
+      );
+
+      return;
+    }
 
 
     attacker.element
@@ -1022,27 +1116,37 @@ async function executeAttack(
     );
 
 
-    // SOM DO ESPECIAL
-    playSound(
-      "especial"
-    );
+    if (
+      !roundEnding &&
+      attacker.hp > 0 &&
+      opponent.hp > 0
+    ) {
+
+      playSound(
+        "especial"
+      );
 
 
-    opponent.hp = 0;
+      opponent.hp =
+        Math.max(
+          0,
+          opponent.hp - move.damage
+        );
 
 
-    showHit(
-      opponentName
-    );
+      showHit(
+        opponentName
+      );
 
 
-    showImpact(
-      "💥 ESPECIAL!",
-      "especial"
-    );
+      showImpact(
+        "💥 ESPECIAL!",
+        "especial"
+      );
 
 
-    updateHUD();
+      updateHUD();
+    }
 
 
     await sleep(500);
@@ -1052,15 +1156,51 @@ async function executeAttack(
       opponentName
     );
 
-
     clearImpact();
-
   }
 
 
   // ========================================
-  // LIMPAR EFEITOS
+  // FINALIZAR O ATAQUE
   // ========================================
+
+  limparAtaque(
+    name,
+    opponentName,
+    move
+  );
+
+
+  // ========================================
+  // VERIFICAR VITÓRIA
+  // ========================================
+
+  if (
+    opponent.hp <= 0 &&
+    !roundEnding
+  ) {
+
+    await finishRound(
+      name,
+      opponentName
+    );
+  }
+}
+
+
+// ========================================
+// LIMPAR ATAQUE
+// ========================================
+
+function limparAtaque(
+  name,
+  opponentName,
+  move
+) {
+
+  const attacker =
+    fighters[name];
+
 
   attacker.element
     .classList
@@ -1076,34 +1216,19 @@ async function executeAttack(
     opponentName
   );
 
-
   clearImpact();
 
 
-  playAnimation(
-    name,
-    "parado"
-  );
-
-
-  // ========================================
-  // VERIFICAR VITÓRIA
-  // ========================================
-
   if (
-    opponent.hp === 0
+    attacker.hp > 0 &&
+    !roundEnding
   ) {
 
-    await finishRound(
-      name,
-      opponentName
+    voltarParaParado(
+      name
     );
-
   }
-
 }
-
-
 // ========================================
 // FINAL DA RODADA
 // ========================================
@@ -1113,25 +1238,28 @@ async function finishRound(
   loserName
 ) {
 
-  if (
-    roundEnding
-  ) {
-
+  // Evita dois KOs/reset ao mesmo tempo.
+  if (roundEnding) {
     return;
-
   }
 
 
+  // Trava imediatamente o processamento
+  // da fila durante o encerramento.
   roundEnding = true;
 
 
   const winner =
     fighters[winnerName];
 
-
   const loser =
     fighters[loserName];
 
+
+  // Para qualquer animação anterior.
+  stopAnimation(
+    winnerName
+  );
 
   stopAnimation(
     loserName
@@ -1145,6 +1273,7 @@ async function finishRound(
     );
 
 
+  // Animação de KO.
   playAnimation(
     loserName,
     "ko",
@@ -1152,7 +1281,7 @@ async function finishRound(
   );
 
 
-  // SOM DE K.O.
+  // Som do KO.
   playSound(
     "ko"
   );
@@ -1187,11 +1316,11 @@ async function finishRound(
   );
 
 
+  // Mantém a tela de vitória por 2 segundos.
   await sleep(2000);
 
 
   resetRound();
-
 }
 
 
@@ -1238,10 +1367,28 @@ function resetRound() {
       name,
       "parado"
     );
-
   }
 
 
+  // Limpa possível energia do especial
+  // que tenha ficado na tela.
+  const energy =
+    document.getElementById(
+      "energiaEspecial"
+    );
+
+
+  if (energy) {
+
+    energy.className =
+      "energia-especial";
+
+    energy.style.transition =
+      "none";
+  }
+
+
+  // Esconde a tela de KO.
   document.getElementById(
     "koOverlay"
   ).classList.add(
@@ -1251,7 +1398,11 @@ function resetRound() {
 
   clearImpact();
 
+  clearHit("lula");
+  clearHit("bolsonaro");
 
+
+  // Libera a nova rodada.
   roundEnding = false;
 
 
@@ -1266,8 +1417,9 @@ function resetRound() {
   );
 
 
+  // Se chegaram presentes enquanto aparecia
+  // o KO, eles continuam aguardando na fila.
   processQueue();
-
 }
 
 
@@ -1298,12 +1450,8 @@ let consultandoPonte = false;
 
 async function consultarPresentes() {
 
-  if (
-    consultandoPonte
-  ) {
-
+  if (consultandoPonte) {
     return;
-
   }
 
 
@@ -1324,7 +1472,6 @@ async function consultarPresentes() {
       throw new Error(
         "Ponte indisponível"
       );
-
     }
 
 
@@ -1342,31 +1489,28 @@ async function consultarPresentes() {
         comando.type,
         "ponte"
       );
-
     }
 
-  }
-
-
-  catch (erro) {
+  } catch (erro) {
 
     // A ponte pode estar desligada.
+    // Não interrompe o funcionamento do jogo.
 
-  }
-
-
-  finally {
+  } finally {
 
     consultandoPonte = false;
-
   }
-
 }
 
 
-// IMPORTANTE:
-// Deixe desativado até verificarmos se os eventos
-// já estão sendo recebidos pelo TikTokService.js.
-// Caso contrário, um presente pode gerar dois golpes.
+// ========================================
+// IMPORTANTE
+// ========================================
 
+// DEIXE ESTA LINHA DESATIVADA.
+//
+// Se os presentes já estiverem chegando pelo
+// TikTokService.js, ativar isso também pode
+// fazer UM presente gerar DOIS golpes.
+//
 // setInterval(consultarPresentes, 400);
