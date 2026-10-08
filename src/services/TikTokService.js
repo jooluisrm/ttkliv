@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TikTokService.js
  * Manages TikTok Live connections for multiple streamers (Multi-tenant)
  *
@@ -19,6 +19,7 @@ import {
 	normalizeGift,
 	normalizeLike,
 	normalizeShare,
+	normalizeUser,
 } from "../lib/tiktokEventNormalizer.js";
 import { getDelay, shouldRetry, sleep } from "../lib/tiktokReconnectPolicy.js";
 
@@ -114,17 +115,31 @@ const connection = new TikTokLiveConnection(username, {
 				);
 			});
 
+			/** Handle Follow Events - dedicated event, no filtering needed */
+			connection.on("follow", (data) => {
+				this.updateActivity(username);
+				io.to(username).emit("tiktok_follow", {
+					user: normalizeUser(data),
+					timestamp: Date.now()
+				});
+				console.log("[" + username + "] Follow de: " + (data.uniqueId || data.nickname || "Espectador"));
+			});
+
 			/** Handle Share Events */
 			connection.on("social", (data) => {
-				if (data.displayType === "pm_mt_msg_viewer_share") {
-					this.updateActivity(username);
+				this.updateActivity(username);
+				const isShare =
+					data.displayType === "pm_mt_msg_viewer_share" ||
+					data.displayType?.includes("share");
+				if (isShare) {
 					const payload = normalizeShare(data);
 					io.to(username).emit("tiktok_share", payload);
-					console.log(`[${username}] Share from ${payload.user.nickname}`);
+					console.log("[" + username + "] Share de: " + payload.user.nickname);
 				}
 			});
 
-			/** Handle Gift Events — single canonical emit, no legacy duplication */
+
+			/** Handle Gift Events â€” single canonical emit, no legacy duplication */
 			
 connection.on("gift", (data) => {
     this.updateActivity(username);
@@ -248,7 +263,7 @@ eventId:
 		this.reconnectState.set(username, { attempting: true, attempt });
 
 		while (shouldRetry(attempt)) {
-			// Bail if no clients remain (nobody watching → no point reconnecting)
+			// Bail if no clients remain (nobody watching â†’ no point reconnecting)
 			if (this.getClientCount(username) === 0) {
 				console.log(
 					`[TikTokService] Reconnect aborted for ${username}: 0 clients`,

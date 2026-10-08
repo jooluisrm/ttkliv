@@ -31,10 +31,12 @@ function criarJanela() {
     // Remove o menu superior do Electron
     janela.setMenu(null);
 
-    // Abre o nosso jogo
-    janela.loadURL(
-        "http://localhost:3000/games/duelo-2d/"
-    );
+    // Abre o nosso jogo (permite passar URL via argumento se desejado, ex: npx electron electron.cjs http://localhost:3000/games/duelo-2d-kim-nik/)
+    const targetUrl = process.argv[2] && process.argv[2].startsWith("http")
+        ? process.argv[2]
+        : "http://localhost:3000/games/duelo-2d-kim-nik/";
+
+    janela.loadURL(targetUrl);
 
     janela.webContents.openDevTools();
 

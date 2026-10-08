@@ -51,13 +51,15 @@ export function normalizeChat(raw) {
  * @returns {{user: Object, likeCount: number, totalLikeCount: number, timestamp: number}}
  */
 export function normalizeLike(raw) {
+	const likeCount = raw.likeCount || raw.like_count || raw.count || 1;
 	return {
 		user: normalizeUser(raw),
-		likeCount: raw.likeCount || 0,
-		totalLikeCount: raw.totalLikeCount || 0,
+		likeCount: Number(likeCount) || 1,
+		totalLikeCount: Number(raw.totalLikeCount || raw.total_like_count || 0),
 		timestamp: Date.now(),
 	};
 }
+
 
 /**
  * Normalize share event.

@@ -15,17 +15,15 @@
 
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ======================================
-       PAINEL DE COMANDOS — NOVO DESIGN
-    ====================================== */
+    /* PAINEL DE COMANDOS DE PRESENTES (NO CÉU DA ARENA) */
     .gifts-legend-container {
       position: absolute;
-      top: clamp(6px, 1.2vw, 10px);
-      left: clamp(6px, 1.2vw, 12px);
-      right: clamp(6px, 1.2vw, 12px);
+      top: 10px;
+      left: 10px;
+      right: 10px;
       display: flex;
       justify-content: space-between;
-      gap: clamp(6px, 1.5vw, 14px);
+      gap: 10px;
       z-index: 8;
       pointer-events: none;
     }
@@ -33,114 +31,58 @@
     .gifts-column {
       display: flex;
       flex-direction: column;
-      gap: clamp(4px, 1vw, 7px);
-      width: min(34%, 205px);
-      min-width: 0;
+      gap: 5px;
+      flex: 1;
+      max-width: 48%;
     }
 
     .gifts-column.left {
-      justify-content: flex-start;
+      align-items: flex-start;
     }
 
     .gifts-column.right {
-      justify-content: flex-end;
+      align-items: flex-end;
     }
 
-    /* Card individual */
     .gift-item {
-      display: flex;
-      flex-direction: row;
+      display: inline-flex;
       align-items: center;
-      justify-content: flex-start;
+      gap: 6px;
       width: 100%;
-      min-height: 40px;
-      padding: 5px 8px;
-      background: linear-gradient(160deg, rgba(15, 15, 30, 0.88) 0%, rgba(30, 20, 60, 0.82) 100%);
-      border-radius: 10px;
-      border: 1px solid rgba(255, 210, 70, 0.35);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.07);
-      gap: 7px;
+      height: 28px;
+      background: rgba(0, 0, 0, 0.65);
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 217, 77, 0.3);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
       box-sizing: border-box;
     }
 
+    .gifts-column.left .gift-item {
+      justify-content: flex-start;
+    }
+
+    .gifts-column.right .gift-item {
+      justify-content: flex-end;
+    }
+
     .gift-item img {
-      width: 27px;
-      height: 27px;
+      width: 20px;
+      height: 20px;
       object-fit: contain;
-      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9));
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
       flex-shrink: 0;
     }
 
-    /* Badge da ação */
-    .gift-action {
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 4px;
+    .gift-item span {
+      font-size: clamp(9px, 1.1vh, 10.5px);
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 1px 1px 2px #000;
       white-space: nowrap;
-      line-height: 1.4;
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-
-    .gift-action.soco {
-      background: #c0392b;
-      color: #fff;
-      text-shadow: 0 1px 2px #000;
-    }
-
-    .gift-action.combo {
-      background: #d4841a;
-      color: #fff;
-      text-shadow: 0 1px 2px #000;
-    }
-
-    .gift-action.especial {
-      background: #6c3fa1;
-      color: #fff;
-      text-shadow: 0 1px 2px #000;
-    }
-
-    /* Linha de texto pequena — nome do item */
-    .gift-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.9);
-      text-shadow: 0 1px 2px #000;
-      white-space: nowrap;
-      text-align: left;
-      line-height: 1;
       overflow: hidden;
       text-overflow: ellipsis;
-      min-width: 0;
-    }
-
-    @media (max-width: 380px) {
-      .gifts-column {
-        width: 47%;
-      }
-
-      .gift-item {
-        padding-inline: 6px;
-        gap: 5px;
-      }
-
-      .gift-item img {
-        width: 24px;
-        height: 24px;
-      }
-
-      .gift-label {
-        font-size: 10px;
-      }
-
-      .gift-action {
-        font-size: 10px;
-        padding-inline: 5px;
-      }
     }
   </style>
 </head>
@@ -153,15 +95,15 @@
     <header class="hud">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3.5%;">
         <h1 style="margin: 0; flex: 1;">Simulação</h1>
-        <button id="btnFullscreen" title="Tela Cheia"
+        <!-- <button id="btnFullscreen" title="Tela Cheia"
           style="background: rgba(255,255,255,0.15); border: 1px solid #ffd94d; color: #ffd94d; font-size: 14px; font-weight: bold; padding: 4px 8px; border-radius: 4px; cursor: pointer; z-index: 30;">⛶
-          FULL</button>
+          FULL</button> -->
       </div>
 
       <div class="health-bars">
 
         <div class="health-box">
-          <div class="fighter-name">LULA</div>
+          <div class="fighter-name">KIM KATAGUIRI</div>
 
           <div class="health-track">
             <div class="health-fill" id="hpLula"></div>
@@ -171,7 +113,7 @@
         </div>
 
         <div class="health-box right">
-          <div class="fighter-name">FLÁVIO<br>BOLSONARO</div>
+          <div class="fighter-name">NIKOLAS FERREIRA</div>
 
           <div class="health-track">
             <div class="health-fill" id="hpBolsonaro"></div>
@@ -193,65 +135,22 @@
       <!-- PAINEL DE COMANDOS DE PRESENTES (Comentar esta DIV para remover) -->
       <!-- ================================================================= -->
       <div class="gifts-legend-container">
-
-        <!-- LULA (esquerda) -->
         <div class="gifts-column left">
-
-          <div class="gift-item">
-            <img src="icones/tiktok-heart.png" alt="Curtidas">
-            <span class="gift-label">100 curtidas</span>
-            <span class="gift-action soco">SOCO</span>
+          <div class="gift-item"><img src="icones/tiktok-heart.png" alt="Curtidas"> <span>50 Curtidas = Soco</span>
           </div>
-
-          <div class="gift-item">
-            <img src="icones/rose.webp" alt="Rose">
-            <span class="gift-label">Rose</span>
-            <span class="gift-action soco">SOCO</span>
-          </div>
-
-          <div class="gift-item">
-            <img src="icones/tiny-diny.webp" alt="Tiny Diny">
-            <span class="gift-label">Tiny Diny</span>
-            <span class="gift-action combo">COMBO</span>
-          </div>
-
-          <div class="gift-item">
-            <img src="icones/confetti.webp" alt="Confetti">
-            <span class="gift-label">Confetti</span>
-            <span class="gift-action especial">ESPECIAL</span>
-          </div>
-
+          <div class="gift-item"><img src="icones/rose.webp" alt="Rose"> <span>Rose = Soco</span></div>
+          <div class="gift-item"><img src="icones/tiny-diny.webp" alt="Tiny Diny"> <span>Tiny Diny = Combo</span></div>
+          <div class="gift-item"><img src="icones/confetti.webp" alt="Confetti"> <span>Confetti = Especial</span></div>
         </div>
-
-        <!-- BOLSONARO (direita) -->
         <div class="gifts-column right">
-
-          <div class="gift-item">
-            <img src="icones/seguir.png" alt="Seguir/Share">
-            <span class="gift-label">Seguir/Share</span>
-            <span class="gift-action soco">SOCO</span>
-          </div>
-
-          <div class="gift-item">
-            <img src="icones/gg.webp" alt="GG">
-            <span class="gift-label">GG</span>
-            <span class="gift-action soco">SOCO</span>
-          </div>
-
-          <div class="gift-item">
-            <img src="icones/heart.webp" alt="Heart">
-            <span class="gift-label">Heart</span>
-            <span class="gift-action combo">COMBO</span>
-          </div>
-
-          <div class="gift-item">
-            <img src="icones/heart-my-earthling.webp" alt="Earthling">
-            <span class="gift-label">Earthling</span>
-            <span class="gift-action especial">ESPECIAL</span>
-          </div>
-
+          <div class="gift-item"><span>10 Seguir = Soco</span> <img src="icones/seguir.png" alt="Seguir"></div>
+          <div class="gift-item"><span>GG = Soco</span> <img src="icones/gg.webp" alt="GG"></div>
+          <div class="gift-item"><span>Heart = Combo</span> <img src="icones/heart.webp" alt="Heart"></div>
+          <div class="gift-item"><span>Earthling = Especial</span> <img src="icones/heart-my-earthling.webp"
+              alt="Earthling"></div>
         </div>
       </div>
+
       <!-- ================================================================= -->
 
       <!-- CENÁRIO -->
@@ -263,10 +162,10 @@
       </div>
 
 
-      <!-- LUTADOR: LULA -->
+      <!-- LUTADOR: KIM -->
       <div class="fighter lula" id="lula">
 
-        <img id="spriteLula" src="sprites/lula/parado-1.png" alt="Lula em pixel art">
+        <img id="spriteLula" src="sprites/kim/kim-idle.png" alt="Kim em pixel art">
 
         <div class="placeholder">
           <div class="head"></div>
@@ -280,10 +179,10 @@
       </div>
 
 
-      <!-- LUTADOR: BOLSONARO -->
+      <!-- LUTADOR: NIKOLAS -->
       <div class="fighter bolsonaro" id="bolsonaro">
 
-        <img id="spriteBolsonaro" src="sprites/bolsonaro/parado-1.png" alt="Bolsonaro em pixel art">
+        <img id="spriteBolsonaro" src="sprites/nikolas/nikolas-idle.png" alt="Nikolas em pixel art">
 
         <div class="placeholder">
           <div class="head"></div>
@@ -321,7 +220,7 @@
       <div class="score-row">
 
         <div class="score lula-score">
-          <span>LULA</span>
+          <span>KIM</span>
           <strong id="winsLula">0</strong>
         </div>
 
@@ -331,7 +230,7 @@
         </div>
 
         <div class="score bolsonaro-score">
-          <span>FLÁVIO<br>BOLSONARO</span>
+          <span>NIKOLAS</span>
           <strong id="winsBolsonaro">0</strong>
         </div>
 
@@ -379,7 +278,6 @@
       });
     }
   </script>
-
 </body>
 
 </html>

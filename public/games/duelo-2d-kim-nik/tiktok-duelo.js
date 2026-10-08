@@ -4,7 +4,7 @@
 // ========================================
 
 const urlParams = new URLSearchParams(window.location.search);
-const TIKTOK_USERNAME = urlParams.get("id") || urlParams.get("username") || "xpedroks4";
+const TIKTOK_USERNAME = urlParams.get("id") || urlParams.get("username") || "vcapareceraaqui";
 // Mantém os mesmos seis presentes e golpes.
 const PRESENTES_DUELO = {
   5655: {
@@ -351,32 +351,33 @@ if (typeof io !== "function") {
   // MECÂNICA GRATUITA (CURTIDAS E SEGUIDORES)
   // ========================================
   let acumuladorCurtidas = 0;
+  let acumuladorSeguidores = 0;
 
-  // A cada 100 curtidas na live: Lula dá 1 soco
+  // A cada 50 curtidas na live: Lula (Kim) dá 1 soco
   socketDuelo.on("tiktok_like", data => {
     console.log("[Duelo] Evento de curtida recebido:", data);
     const qtd = Number(data?.likeCount || data?.like_count || data?.label || 1);
     acumuladorCurtidas += qtd;
-    console.log(`[Duelo] Progresso Curtidas: ${acumuladorCurtidas}/100 (+${qtd})`);
+    console.log(`[Duelo] Progresso Curtidas: ${acumuladorCurtidas}/50 (+${qtd})`);
 
-    while (acumuladorCurtidas >= 100) {
-      acumuladorCurtidas -= 100;
-      attack("lula", "soco", "curtidas-100");
-      console.log("[Duelo] Meta de 100 Curtidas atingida -> Lula soco!");
+    while (acumuladorCurtidas >= 50) {
+      acumuladorCurtidas -= 50;
+      attack("lula", "soco", "curtidas-50");
+      console.log("[Duelo] Meta de 50 Curtidas atingida -> Lula soco!");
     }
   });
 
 
-  // Seguir a live: Bolsonaro dá 1 soco
+  // A cada 10 seguidores novos na live: Nikolas (Bolsonaro) dá 1 soco
   socketDuelo.on("tiktok_follow", data => {
-    console.log(`[Duelo] Follow de ${data?.user?.nickname || "espectador"} -> Bolsonaro soco!`);
-    attack("bolsonaro", "soco", "seguidor");
-  });
+    acumuladorSeguidores += 1;
+    console.log(`[Duelo] Progresso Seguidores: ${acumuladorSeguidores}/10 (+1) de ${data?.user?.nickname || "espectador"}`);
 
-  // Compartilhar a live: Bolsonaro dá 1 soco
-  socketDuelo.on("tiktok_share", data => {
-    console.log(`[Duelo] Share de ${data?.user?.nickname || "espectador"} -> Bolsonaro soco!`);
-    attack("bolsonaro", "soco", "compartilhar");
+    if (acumuladorSeguidores >= 10) {
+      acumuladorSeguidores = 0;
+      attack("bolsonaro", "soco", "seguidores-10");
+      console.log("[Duelo] Meta de 10 Seguidores atingida -> Nikolas soco!");
+    }
   });
 
 
@@ -402,5 +403,6 @@ if (typeof io !== "function") {
 }
 
 console.log(
-  "[Duelo] Mecânicas ativas: Presentes + (100 curtidas = Lula soco) + (seguir/compartilhar = Bolsonaro soco)!"
+  "[Duelo] Mecânicas ativas: Presentes + (50 curtidas = Lula soco) + (10 seguidores = Nikolas soco)!"
 );
+
