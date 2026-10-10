@@ -1,0 +1,1958 @@
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background:
+        radial-gradient(
+            circle at top,
+            #20283d 0%,
+            #090b12 55%,
+            #05060a 100%
+        );
+
+    color: white;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    display: flex;
+    justify-content: center;
+
+    min-height: 100vh;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   JOGO
+===================================================== */
+
+#game {
+    position: relative;
+
+    width:
+        min(
+            100vw,
+            56.25vh
+        );
+
+    aspect-ratio:
+        9 / 16;
+
+    background:
+        #0b0e18;
+
+    display: flex;
+
+    flex-direction:
+        column;
+
+    overflow: hidden;
+
+    border-left:
+        2px solid
+        rgba(
+            255,
+            255,
+            255,
+            .08
+        );
+
+    border-right:
+        2px solid
+        rgba(
+            255,
+            255,
+            255,
+            .08
+        );
+
+    box-shadow:
+        0 0 40px
+        rgba(
+            0,
+            0,
+            0,
+            .8
+        ),
+
+        0 0 100px
+        rgba(
+            60,
+            80,
+            160,
+            .15
+        );
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+.hud {
+    position: relative;
+
+    padding:
+        2.2%
+        3.5%
+        3.8%;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                8,
+                11,
+                22,
+                .98
+            )
+            0%,
+
+            rgba(
+                20,
+                27,
+                50,
+                .97
+            )
+            100%
+        );
+
+    border-bottom:
+        2px solid
+        rgba(
+            255,
+            215,
+            80,
+            .35
+        );
+
+    box-shadow:
+        0 7px 18px
+        rgba(
+            0,
+            0,
+            0,
+            .45
+        );
+
+    z-index: 10;
+}
+
+
+.hud h1 {
+    text-align: center;
+
+    margin:
+        0 0 3.5%;
+
+    font-size:
+        clamp(
+            15px,
+            2.4vh,
+            25px
+        );
+
+    letter-spacing:
+        2px;
+
+    color:
+        #ffd94d;
+
+    text-shadow:
+        2px 2px 0
+        #8b2837,
+
+        0 0 12px
+        rgba(
+            255,
+            218,
+            75,
+            .25
+        );
+}
+
+
+/* =====================================================
+   BARRAS DE VIDA
+===================================================== */
+
+.health-bars {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:
+        12%;
+}
+
+
+.health-box {
+    position: relative;
+
+    font-size:
+        13px;
+
+    font-weight:
+        900;
+}
+
+
+.health-box.right {
+    text-align:
+        right;
+}
+
+
+.fighter-name {
+    display: block;
+
+    min-height:
+        unset;
+
+    margin-bottom:
+        5px;
+
+    padding:
+        0;
+
+    background:
+        transparent;
+
+    border:
+        none;
+
+    border-radius:
+        0;
+
+    font-size:
+        clamp(
+            11px,
+            1.6vh,
+            15px
+        );
+
+    line-height:
+        1.05;
+
+    letter-spacing:
+        .8px;
+
+    color:
+        white;
+
+    text-shadow:
+        2px 2px 0
+        #000,
+
+        0 0 5px
+        #000;
+}
+
+
+.health-box.right
+.fighter-name {
+    font-size:
+        clamp(
+            10px,
+            1.4vh,
+            13px
+        );
+
+    line-height:
+        1.05;
+
+    letter-spacing:
+        0;
+}
+
+
+/* =====================================================
+   TRACK DA VIDA
+===================================================== */
+
+.health-track {
+    position: relative;
+
+    height:
+        20px;
+
+    margin:
+        0;
+
+    background:
+        #2b1017;
+
+    border:
+        2px solid
+        #ffffff;
+
+    border-radius:
+        4px;
+
+    overflow:
+        hidden;
+
+    box-shadow:
+        0 2px 0
+        #000,
+
+        0 0 7px
+        rgba(
+            255,
+            255,
+            255,
+            .15
+        );
+}
+
+
+.health-track::after {
+    content: "";
+
+    position:
+        absolute;
+
+    left:
+        0;
+
+    right:
+        0;
+
+    top:
+        2px;
+
+    height:
+        3px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .22
+        );
+
+    pointer-events:
+        none;
+}
+
+
+.health-fill {
+    height:
+        100%;
+
+    width:
+        100%;
+
+    transition:
+        width
+        .35s ease,
+        background
+        .3s ease;
+
+    box-shadow:
+        inset
+        0 -4px 0
+        rgba(
+            0,
+            0,
+            0,
+            .15
+        );
+}
+
+
+/* =====================================================
+   CORES DA VIDA
+===================================================== */
+
+.health-fill.hp-alto {
+    background:
+        linear-gradient(
+            180deg,
+            #78ff75 0%,
+            #36e751 45%,
+            #11a936 100%
+        );
+}
+
+
+.health-fill.hp-medio {
+    background:
+        linear-gradient(
+            180deg,
+            #fff67a 0%,
+            #ffd83d 45%,
+            #d89a00 100%
+        );
+}
+
+
+.health-fill.hp-baixo {
+    background:
+        linear-gradient(
+            180deg,
+            #ff7777 0%,
+            #ff3b3b 45%,
+            #b80d22 100%
+        );
+
+    animation:
+        hpCritico
+        .7s
+        infinite
+        alternate;
+}
+
+
+@keyframes hpCritico {
+
+    from {
+        filter:
+            brightness(1);
+
+        box-shadow:
+            0 0 4px
+            rgba(
+                255,
+                40,
+                40,
+                .4
+            );
+    }
+
+    to {
+        filter:
+            brightness(1.35);
+
+        box-shadow:
+            0 0 12px
+            rgba(
+                255,
+                30,
+                30,
+                .9
+            );
+    }
+
+}
+
+
+.health-fill.hp-dano {
+    animation:
+        hpDano
+        .18s
+        ease;
+}
+
+
+@keyframes hpDano {
+
+    0% {
+        filter:
+            brightness(1);
+    }
+
+    50% {
+        filter:
+            brightness(2.8);
+    }
+
+    100% {
+        filter:
+            brightness(1);
+    }
+
+}
+
+
+/* =====================================================
+   TEXTO DE HP
+===================================================== */
+
+#textLula,
+#textBolsonaro {
+    display: block;
+
+    margin-top:
+        4px;
+
+    padding:
+        0;
+
+    background:
+        transparent;
+
+    border:
+        0;
+
+    border-radius:
+        0;
+
+    font-size:
+        clamp(
+            9px,
+            1.35vh,
+            12px
+        );
+
+    color:
+        #eeeeee;
+
+    text-shadow:
+        1px 1px 2px
+        #000;
+}
+
+
+/* =====================================================
+   VS
+===================================================== */
+
+.versus {
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    bottom:
+        -19px;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        45px;
+
+    height:
+        45px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        50%;
+
+    font-size:
+        21px;
+
+    font-weight:
+        1000;
+
+    font-style:
+        italic;
+
+    color:
+        #ffe45d;
+
+    background:
+        radial-gradient(
+            circle,
+            #36384e
+            0%,
+            #171a28
+            70%
+        );
+
+    border:
+        3px solid
+        #f6d447;
+
+    text-shadow:
+        2px 2px 0
+        #a62635;
+
+    box-shadow:
+        0 3px 0
+        #000,
+
+        0 0 12px
+        rgba(
+            255,
+            218,
+            70,
+            .45
+        );
+
+    z-index:
+        20;
+}
+
+
+/* =====================================================
+   ARENA
+===================================================== */
+
+.arena {
+    position:
+        relative;
+
+    flex:
+        1;
+
+    min-height:
+        0;
+
+    overflow:
+        hidden;
+
+    background:
+        #24294e
+        url("fundo-brasilia-pixel.png")
+        center 35% /
+        cover
+        no-repeat;
+
+    box-shadow:
+        inset
+        0 15px 25px
+        rgba(
+            0,
+            0,
+            0,
+            .22
+        );
+}
+
+
+/* fundo antigo em HTML não será usado */
+.arena-background {
+    display:
+        none;
+}
+
+
+/* =====================================================
+   ESCURECE O FUNDO
+===================================================== */
+
+.arena::before {
+    content: "";
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    background:
+        linear-gradient(
+            to bottom,
+
+            rgba(
+                0,
+                0,
+                0,
+                .12
+            )
+            0%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .16
+            )
+            35%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .28
+            )
+            70%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .38
+            )
+            100%
+        );
+
+    z-index:
+        1;
+
+    pointer-events:
+        none;
+}
+
+
+/* =====================================================
+   FOCO ATRÁS DOS LUTADORES
+===================================================== */
+
+.arena::after {
+    content: "";
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    bottom:
+        5%;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        90%;
+
+    height:
+        48%;
+
+    background:
+        radial-gradient(
+            ellipse
+            at center,
+
+            rgba(
+                0,
+                0,
+                0,
+                .38
+            )
+            0%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .28
+            )
+            42%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .12
+            )
+            72%,
+
+            rgba(
+                0,
+                0,
+                0,
+                0
+            )
+            100%
+        );
+
+    z-index:
+        2;
+
+    pointer-events:
+        none;
+}
+
+
+/* =====================================================
+   LUTADORES
+===================================================== */
+
+.fighter {
+    position:
+        absolute;
+
+    width:
+        43%;
+
+    height:
+        43%;
+
+    bottom:
+        13%;
+
+    overflow:
+        visible;
+
+    transform-origin:
+        bottom center;
+
+    z-index:
+        5;
+
+    transition:
+        translate
+        .18s
+        ease-out,
+
+        filter
+        .15s
+        ease;
+}
+
+
+.lula {
+    left:
+        10%;
+
+    --shirt:
+        #db3038;
+}
+
+
+.bolsonaro {
+    right:
+        10%;
+
+    --shirt:
+        #245fa9;
+
+    transform:
+        scaleX(-1);
+}
+
+
+/* =====================================================
+   SPRITES
+===================================================== */
+
+.fighter img {
+    position:
+        relative;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        contain;
+
+    image-rendering:
+        pixelated;
+
+    z-index:
+        6;
+
+    filter:
+        drop-shadow(
+            0 8px 4px
+            rgba(
+                0,
+                0,
+                0,
+                .55
+            )
+        )
+
+        drop-shadow(
+            0 0 5px
+            rgba(
+                255,
+                225,
+                130,
+                .14
+            )
+        );
+}
+
+
+.fighter:not(.has-sprite)
+img {
+    display:
+        none;
+}
+
+
+.fighter.has-sprite
+.placeholder {
+    display:
+        none;
+}
+
+
+/* =====================================================
+   PERSONAGENS PROVISÓRIOS
+===================================================== */
+
+.placeholder {
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    animation:
+        idle
+        .6s
+        steps(2)
+        infinite;
+}
+
+
+.head {
+    position:
+        absolute;
+
+    width:
+        37%;
+
+    height:
+        27%;
+
+    top:
+        3%;
+
+    left:
+        31%;
+
+    background:
+        #e9b48e;
+
+    border:
+        5px solid
+        #302631;
+
+    box-shadow:
+        inset
+        0 9px
+        #49414a;
+}
+
+
+.torso {
+    position:
+        absolute;
+
+    width:
+        58%;
+
+    height:
+        35%;
+
+    top:
+        30%;
+
+    left:
+        21%;
+
+    background:
+        var(--shirt);
+
+    border:
+        5px solid
+        #302631;
+}
+
+
+.arm {
+    position:
+        absolute;
+
+    width:
+        43%;
+
+    height:
+        13%;
+
+    top:
+        40%;
+
+    left:
+        52%;
+
+    background:
+        #e9b48e;
+
+    border:
+        4px solid
+        #302631;
+
+    transform-origin:
+        left center;
+}
+
+
+.legs {
+    position:
+        absolute;
+
+    width:
+        60%;
+
+    height:
+        32%;
+
+    bottom:
+        0;
+
+    left:
+        20%;
+
+    border-left:
+        18px solid
+        #252a45;
+
+    border-right:
+        18px solid
+        #252a45;
+}
+
+
+/* =====================================================
+   SOMBRA DOS LUTADORES
+===================================================== */
+
+.fighter-shadow {
+    position:
+        absolute;
+
+    width:
+        74%;
+
+    height:
+        13px;
+
+    left:
+        13%;
+
+    bottom:
+        -3px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .52
+        );
+
+    filter:
+        blur(2px);
+
+    border-radius:
+        50%;
+
+    z-index:
+        3;
+}
+
+
+/* =====================================================
+   IDLE
+===================================================== */
+
+@keyframes idle {
+
+    0%,
+    100% {
+        translate:
+            0 0;
+    }
+
+    50% {
+        translate:
+            0 -8px;
+    }
+
+}
+
+
+/* =====================================================
+   ATAQUES
+===================================================== */
+
+.fighter:not(.has-sprite).punch
+.arm {
+    animation:
+        socoBraco
+        .22s
+        steps(2)
+        2;
+}
+
+
+.fighter:not(.has-sprite).combo
+.arm {
+    animation:
+        punch
+        .15s
+        steps(2)
+        8;
+}
+
+
+.fighter:not(.has-sprite).special
+.arm {
+    animation:
+        punch
+        .12s
+        steps(2)
+        12;
+}
+
+
+@keyframes punch {
+
+    0%,
+    100% {
+        transform:
+            rotate(0);
+    }
+
+    50% {
+        transform:
+            rotate(-40deg)
+            scaleX(1.5);
+    }
+
+}
+
+
+@keyframes socoBraco {
+
+    0%,
+    100% {
+        transform:
+            rotate(0);
+    }
+
+    50% {
+        transform:
+            rotate(-25deg)
+            scaleX(1.8);
+    }
+
+}
+
+
+/* =====================================================
+   AVANÇO DOS GOLPES
+===================================================== */
+
+.lula.soco-avancando {
+    translate:
+        35px 0;
+}
+
+
+.bolsonaro.soco-avancando {
+    translate:
+        -35px 0;
+}
+
+
+.lula.combo-avancando {
+    translate:
+        55px 0;
+}
+
+
+.bolsonaro.combo-avancando {
+    translate:
+        -55px 0;
+}
+
+
+.lula.especial-avancando {
+    translate:
+        65px 0;
+}
+
+
+.bolsonaro.especial-avancando {
+    translate:
+        -65px 0;
+}
+
+
+/* =====================================================
+   LUTADOR ATACANDO
+===================================================== */
+
+.fighter.attacking {
+    filter:
+        drop-shadow(
+            0 0 13px
+            rgba(
+                255,
+                224,
+                100,
+                .8
+            )
+        );
+
+    z-index:
+        7;
+}
+
+
+.fighter.special,
+.fighter.especial-energia {
+    filter:
+        drop-shadow(
+            0 0 20px
+            #ffe34d
+        );
+}
+
+
+/* =====================================================
+   RECEBENDO GOLPE
+===================================================== */
+
+.fighter.hit,
+.fighter.recebendo-soco {
+    filter:
+        brightness(2)
+
+        drop-shadow(
+            0 0 14px
+            #ffe251
+        );
+}
+
+
+/* =====================================================
+   DERROTA
+===================================================== */
+
+.fighter.defeated {
+    animation:
+        fall
+        .65s
+        ease-out
+        forwards;
+}
+
+
+@keyframes fall {
+
+    to {
+        translate:
+            0 24px;
+
+        rotate:
+            85deg;
+    }
+
+}
+
+
+/* =====================================================
+   IMPACTO
+===================================================== */
+
+.impact {
+    position:
+        absolute;
+
+    top:
+        42%;
+
+    left:
+        50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    color:
+        #ffe233;
+
+    font-size:
+        clamp(
+            28px,
+            5.5vh,
+            62px
+        );
+
+    font-weight:
+        900;
+
+    text-shadow:
+        3px 3px 0
+        #c82435,
+
+        0 0 14px
+        rgba(
+            255,
+            230,
+            65,
+            .7
+        );
+
+    z-index:
+        30;
+
+    pointer-events:
+        none;
+}
+
+
+/* =====================================================
+   IMPACTO DO SOCO
+===================================================== */
+
+.impact.soco-impacto {
+    animation:
+        impactoSoco
+        .35s
+        ease-out
+        forwards;
+}
+
+
+@keyframes impactoSoco {
+
+    0% {
+        opacity:
+            0;
+
+        scale:
+            .3;
+    }
+
+    45% {
+        opacity:
+            1;
+
+        scale:
+            1.5;
+    }
+
+    100% {
+        opacity:
+            0;
+
+        scale:
+            1;
+    }
+
+}
+
+
+/* =====================================================
+   IMPACTO DO ESPECIAL
+===================================================== */
+
+.impact.especial-impacto {
+    animation:
+        impactoEspecial
+        .5s
+        ease-out;
+
+    z-index:
+        30;
+}
+
+
+@keyframes impactoEspecial {
+
+    0% {
+        opacity:
+            0;
+
+        scale:
+            .5;
+    }
+
+    40% {
+        opacity:
+            1;
+
+        scale:
+            1.5;
+    }
+
+    100% {
+        opacity:
+            0;
+
+        scale:
+            1;
+    }
+
+}
+
+
+/* =====================================================
+   BOLA DO ESPECIAL
+===================================================== */
+
+.energia-especial {
+    position:
+        absolute;
+
+    width:
+        65px;
+
+    height:
+        65px;
+
+    border-radius:
+        50%;
+
+    pointer-events:
+        none;
+
+    z-index:
+        20;
+
+    opacity:
+        0;
+
+    left:
+        50%;
+
+    top:
+        55%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+}
+
+
+.energia-especial.lula {
+    background:
+        radial-gradient(
+            circle,
+
+            #ffffff
+            0%,
+
+            #ffec77
+            18%,
+
+            #ff5633
+            45%,
+
+            #e40024
+            70%,
+
+            transparent
+            75%
+        );
+
+    box-shadow:
+        0 0 20px
+        #ff4329,
+
+        0 0 45px
+        #f00020;
+}
+
+
+.energia-especial.bolsonaro {
+    background:
+        radial-gradient(
+            circle,
+
+            #ffffff
+            0%,
+
+            #a6f8ff
+            20%,
+
+            #229dff
+            48%,
+
+            #073cff
+            70%,
+
+            transparent
+            75%
+        );
+
+    box-shadow:
+        0 0 20px
+        #299dff,
+
+        0 0 45px
+        #073cff;
+}
+
+
+.energia-especial.disparando {
+    opacity:
+        1;
+
+    transition:
+        left
+        .45s
+        linear;
+}
+
+
+/* =====================================================
+   TREMOR DA ARENA
+===================================================== */
+
+.arena.tremendo {
+    animation:
+        tremerArena
+        .4s
+        linear;
+}
+
+
+@keyframes tremerArena {
+
+    0%,
+    100% {
+        translate:
+            0 0;
+    }
+
+    20% {
+        translate:
+            -5px 3px;
+    }
+
+    40% {
+        translate:
+            5px -3px;
+    }
+
+    60% {
+        translate:
+            -4px -2px;
+    }
+
+    80% {
+        translate:
+            4px 3px;
+    }
+
+}
+
+
+/* =====================================================
+   K.O.
+===================================================== */
+
+.ko-overlay {
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        40;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(
+            5,
+            5,
+            12,
+            .78
+        );
+
+    backdrop-filter:
+        blur(2px);
+}
+
+
+.ko-title {
+    color:
+        #ffe152;
+
+    font-size:
+        clamp(
+            65px,
+            12vh,
+            125px
+        );
+
+    font-weight:
+        900;
+
+    transform:
+        skew(-7deg);
+
+    text-shadow:
+        6px 6px 0
+        #b82235,
+
+        0 0 25px
+        rgba(
+            255,
+            216,
+            70,
+            .5
+        );
+}
+
+
+.winner-text {
+    margin-top:
+        12px;
+
+    padding:
+        8px 14px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .45
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .2
+        );
+
+    border-radius:
+        5px;
+
+    font-size:
+        clamp(
+            15px,
+            2.4vh,
+            25px
+        );
+
+    font-weight:
+        bold;
+
+    text-align:
+        center;
+}
+
+
+.hidden {
+    display:
+        none;
+}
+
+
+/* =====================================================
+   PLACAR
+===================================================== */
+
+.scoreboard {
+    position:
+        relative;
+
+    padding:
+        2.2%
+        3.5%
+        2.6%;
+
+    text-align:
+        center;
+
+    background:
+        linear-gradient(
+            180deg,
+            #141b2e 0%,
+            #0a0e19 100%
+        );
+
+    border-top:
+        2px solid
+        rgba(
+            255,
+            211,
+            70,
+            .55
+        );
+
+    box-shadow:
+        0 -8px 18px
+        rgba(
+            0,
+            0,
+            0,
+            .3
+        );
+
+    z-index:
+        10;
+}
+
+
+.scoreboard h2 {
+    margin-bottom:
+        2%;
+
+    font-size:
+        clamp(
+            13px,
+            2vh,
+            19px
+        );
+
+    letter-spacing:
+        2px;
+
+    color:
+        #ffdb52;
+
+    text-shadow:
+        2px 2px 0
+        #7f2934;
+}
+
+
+.score-row {
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr
+        .55fr
+        1fr;
+
+    gap:
+        7px;
+}
+
+
+.score,
+.round-box {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    gap:
+        4px;
+
+    min-height:
+        57px;
+
+    padding:
+        5px 3px;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .2
+        );
+
+    border-radius:
+        6px;
+
+    box-shadow:
+        inset
+        0 0 9px
+        rgba(
+            0,
+            0,
+            0,
+            .25
+        );
+}
+
+
+.lula-score {
+    background:
+        linear-gradient(
+            145deg,
+            #762530,
+            #431720
+        );
+}
+
+
+.bolsonaro-score {
+    background:
+        linear-gradient(
+            145deg,
+            #254989,
+            #172b57
+        );
+}
+
+
+.round-box {
+    background:
+        linear-gradient(
+            145deg,
+            #373b53,
+            #232638
+        );
+}
+
+
+.score span,
+.round-box span {
+    font-size:
+        clamp(
+            8px,
+            1.25vh,
+            11px
+        );
+
+    line-height:
+        1.1;
+
+    font-weight:
+        900;
+}
+
+
+.bolsonaro-score span {
+    font-size:
+        10px;
+
+    line-height:
+        1.3;
+}
+
+
+.score strong,
+.round-box strong {
+    font-size:
+        clamp(
+            21px,
+            3.7vh,
+            38px
+        );
+
+    line-height:
+        .95;
+
+    text-shadow:
+        2px 2px 0
+        #000;
+}
+
+
+/* =====================================================
+   CONTROLES DE TESTE
+===================================================== */
+
+.controls {
+    padding:
+        3%;
+
+    background:
+        #151b30;
+}
+
+
+.controls h2 {
+    text-align:
+        center;
+
+    font-size:
+        13px;
+
+    margin-bottom:
+        9px;
+}
+
+
+.buttons {
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:
+        10px;
+}
+
+
+.button-group {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        5px;
+}
+
+
+.button-group strong {
+    font-size:
+        12px;
+}
+
+
+button {
+    padding:
+        7px 2px;
+
+    background:
+        #303c65;
+
+    border:
+        2px solid
+        #e8c254;
+
+    color:
+        white;
+
+    font:
+        bold
+        11px
+        monospace;
+
+    cursor:
+        pointer;
+}
+
+
+button:hover {
+    background:
+        #495a91;
+}
+
+
+button:disabled {
+    opacity:
+        .5;
+}

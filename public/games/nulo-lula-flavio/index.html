@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tabela de Votação - Live</title>
+
+  <style>
+    /* ======================================
+       ESTILOS GERAIS DA PÁGINA
+    ====================================== */
+    body {
+      margin: 0;
+      padding: 10px;
+      background: radial-gradient(circle at center, #1a103c 0%, #0a0514 100%);
+      color: #ffffff;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ======================================
+       CONTAINER PRINCIPAL
+    ====================================== */
+    .table-container {
+      background: rgba(15, 15, 30, 0.6);
+      border-radius: 24px;
+      border: 3px solid rgba(255, 210, 70, 0.5);
+      box-shadow: 0 0 50px rgba(255, 210, 70, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      padding: 40px;
+      width: 100%;
+      max-width: 1100px;
+      box-sizing: border-box;
+    }
+
+    .header-live {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .title {
+      color: #ffd94d;
+      font-size: 48px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin: 0;
+      text-shadow: 0 4px 20px rgba(255, 210, 70, 0.6);
+    }
+
+    .subtitle {
+      color: #00ff88;
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      animation: piscar 1.5s infinite;
+    }
+
+    /* ======================================
+       TABELA E CARDS
+    ====================================== */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 20px;
+      text-align: center;
+    }
+
+    th {
+      padding: 10px 15px;
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 2px;
+    }
+
+    td {
+      padding: 20px 15px;
+      vertical-align: middle;
+      background: rgba(255, 255, 255, 0.05);
+      border-top: 2px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    td:first-child {
+      border-left: 2px solid rgba(255, 255, 255, 0.1);
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+    }
+
+    td:last-child {
+      border-right: 2px solid rgba(255, 255, 255, 0.1);
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+
+    .nome-candidato {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ======================================
+       IMAGENS
+    ====================================== */
+    .candidato-img {
+      width: 130px;
+      height: 130px;
+      background: #000;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      object-fit: cover;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .gift-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .gift-img {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.9));
+      animation: pular 2s infinite ease-in-out;
+    }
+
+    .gift-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: #000;
+      background: #ffd94d;
+      padding: 6px 16px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 10px rgba(255, 210, 70, 0.4);
+      white-space: nowrap;
+    }
+
+    /* ======================================
+       CONTADOR
+    ====================================== */
+    .contador {
+      font-size: 75px;
+      font-weight: 900;
+      color: #00ff88;
+      text-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 2px 2px 0px #000;
+      font-family: 'Courier New', Courier, monospace;
+      width: 150px;
+    }
+
+    /* ======================================
+       ANIMAÇÕES
+    ====================================== */
+    @keyframes piscar {
+
+      0%,
+      100% {
+        opacity: 1;
+        text-shadow: 0 0 20px #00ff88;
+      }
+
+      50% {
+        opacity: 0.6;
+        text-shadow: none;
+      }
+    }
+
+    @keyframes pular {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(-10px) scale(1.1);
+      }
+    }
+
+    /* ======================================
+       RESPONSIVIDADE (CELULARES E TABLETS)
+    ====================================== */
+    @media (max-width: 850px) {
+      .table-container {
+        padding: 20px 10px;
+        border-radius: 16px;
+      }
+
+      .title {
+        font-size: 32px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      .nome-candidato {
+        font-size: 24px;
+      }
+
+      .candidato-img {
+        width: 80px;
+        height: 80px;
+        border-width: 2px;
+      }
+
+      .gift-img {
+        width: 60px;
+        height: 60px;
+      }
+
+      .gift-name {
+        font-size: 12px;
+        padding: 4px 10px;
+      }
+
+      .contador {
+        font-size: 45px;
+        width: 80px;
+      }
+
+      th {
+        font-size: 14px;
+        padding: 5px;
+      }
+
+      td {
+        padding: 10px 8px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .title {
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        margin-top: 5px;
+      }
+
+      /* Esconder cabeçalho no celular para ganhar espaço nas laterais */
+      thead {
+        display: none;
+      }
+
+      table {
+        border-spacing: 0 10px;
+      }
+
+      .nome-candidato {
+        font-size: 16px;
+      }
+
+      .candidato-img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .gift-img {
+        width: 40px;
+        height: 40px;
+      }
+
+      .gift-name {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+
+      .contador {
+        font-size: 30px;
+        width: auto;
+        min-width: 40px;
+      }
+
+      td {
+        padding: 8px 4px;
+      }
+
+      td:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+      }
+
+      td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="table-container">
+    <div class="header-live">
+      <h1 class="title">Votação Ao Vivo</h1>
+      <div class="subtitle">Envie o presente para votar! 🎯</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Candidato</th>
+          <th>Nome</th>
+          <th>O que enviar</th>
+          <th>Votos</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- LINHA 1: LULA -->
+        <tr>
+          <td>
+            <img src="sprites/lula.png" alt="Foto Lula" class="candidato-img">
+          </td>
+          <td class="nome-candidato" style="color: #ff3333;">LULA</td>
+          <td>
+            <div class="gift-container">
+              <img src="icones/rose.webp" alt="Flor" class="gift-img">
+              <span class="gift-name">Envie 🌹</span>
+            </div>
+          </td>
+          <td class="contador" id="votosLula">0</td>
+        </tr>
+
+        <!-- LINHA 2: FLÁVIO -->
+        <tr>
+          <td>
+            <img src="sprites/flavio.png" alt="Foto Flávio" class="candidato-img">
+          </td>
+          <td class="nome-candidato" style="color: #3388ff;">FLÁVIO</td>
+          <td>
+            <div class="gift-container">
+              <img src="icones/gg.webp" alt="GG" class="gift-img">
+              <span class="gift-name">Envie GG</span>
+            </div>
+          </td>
+          <td class="contador" id="votosFlavio">0</td>
+        </tr>
+
+        <!-- LINHA 3: NULO -->
+        <tr>
+          <td>
+            <img src="sprites/voto-nulo.png" alt="Ícone Nulo" class="candidato-img">
+          </td>
+          <td class="nome-candidato" style="color: #aaaaaa;">NULO</td>
+          <td>
+            <div class="gift-container">
+              <img src="icones/tiny-diny.webp" alt="Dinossauro" class="gift-img">
+              <span class="gift-name">Envie Dino</span>
+            </div>
+          </td>
+          <td class="contador" id="votosNulo">0</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="tiktok-duelo.js"></script>
+
+  <script>
+    let votos = {
+      lula: 0,
+      flavio: 0,
+      nulo: 0
+    };
+
+    window.addEventListener("votoRecebido", (event) => {
+      const candidato = event.detail.candidato;
+      const quantidade = event.detail.quantidade;
+
+      if (votos[candidato] !== undefined) {
+        votos[candidato] += quantidade;
+
+        if (candidato === "lula") {
+          document.getElementById("votosLula").innerText = votos.lula;
+        } else if (candidato === "flavio") {
+          document.getElementById("votosFlavio").innerText = votos.flavio;
+        } else if (candidato === "nulo") {
+          document.getElementById("votosNulo").innerText = votos.nulo;
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>
